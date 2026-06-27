@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fever — Constelación Onírica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+  :root {
+    --bg:#07050f;
+    --p4:#8A38F5;--p5:#9d50ff;--p6:#b96fff;
+    --t0:#fff;--t60:rgba(255,255,255,.60);--t40:rgba(255,255,255,.40);--t20:rgba(255,255,255,.20);--t10:rgba(255,255,255,.10);
+    --border:rgba(138,56,245,.20);--border-h:rgba(138,56,245,.45);
+    --green:#22c55e;--red:#f87171;
+    --f-head:'Space Grotesk',sans-serif;--f-body:'Inter',sans-serif;--f-mono:'JetBrains Mono',monospace;
+    --ease:cubic-bezier(.4,0,.2,1);--t:.25s;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{opacity:0;transition:opacity .4s ease;}html.ready{opacity:1;}
+  body{background:var(--bg);color:var(--t0);font-family:var(--f-body);overflow:hidden;height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
+
+  /* ── TOPBAR ── */
+  .topbar{height:52px;flex-shrink:0;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:20px;background:rgba(7,5,15,.9);backdrop-filter:blur(12px);position:relative;z-index:100;}
+  .topbar__back{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--t40);text-decoration:none;padding:6px 14px;border:1px solid var(--border);border-radius:100px;transition:all var(--t) var(--ease);}
+  .topbar__back:hover{color:var(--t0);border-color:var(--border-h);}
+  .topbar__back svg{width:14px;height:14px;}
+  .topbar__brand{display:flex;align-items:center;gap:10px;margin-left:8px;}
+  .topbar__logo{width:36px;height:36px;border-radius:10px;background:rgba(138,56,245,.15);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+  .topbar__name{font-family:var(--f-head);font-size:14px;font-weight:700;color:var(--t0);}
+  .topbar__sub{font-size:10px;color:var(--t40);}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.5s ease-in-out infinite;flex-shrink:0;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .topbar__live{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;font-weight:700;color:var(--green);}
+
+  /* ── MAIN LAYOUT ── */
+  .main{flex:1;display:grid;grid-template-columns:420px 1fr 240px;min-height:0;}
+
+  /* ── CHAT PANEL ── */
+  .chat{display:flex;flex-direction:column;border-right:1px solid var(--border);background:rgba(255,255,255,.015);min-height:0;overflow:hidden;}
+  .chat__msgs{flex:1;overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;min-height:0;}
+  .chat__msgs::-webkit-scrollbar{width:2px;}
+  .chat__msgs::-webkit-scrollbar-thumb{background:var(--p4);border-radius:2px;}
+
+  /* bubbles */
+  .msg{display:flex;gap:10px;animation:fadeUp .3s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .msg--user{flex-direction:row-reverse;}
+  .msg__avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .msg__avatar--ai{background:rgba(138,56,245,.2);border:1px solid var(--border);color:var(--p5);}
+  .msg__avatar--user{background:rgba(138,56,245,.3);color:#fff;}
+  .msg__body{max-width:300px;}
+  .msg__meta{font-size:10px;font-weight:700;color:var(--t40);margin-bottom:5px;letter-spacing:.06em;}
+  .msg--user .msg__meta{text-align:right;color:#a78bfa;}
+  .msg__bubble{padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.65;}
+  .msg__bubble--ai{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--t0);border-radius:4px 14px 14px 14px;}
+  .msg__bubble--user{background:rgba(138,56,245,.25);border:1px solid rgba(138,56,245,.4);color:var(--t0);border-radius:14px 4px 14px 14px;}
+  .msg__tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .msg__tag{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(138,56,245,.15);border:1px solid rgba(138,56,245,.35);color:var(--p6);cursor:default;}
+  .msg__footer{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;}
+  .msg__connected{color:var(--green);display:flex;align-items:center;gap:5px;}
+  .msg__connections{color:var(--p5);}
+
+  /* typing indicator */
+  .typing{display:flex;gap:4px;padding:12px 14px;}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--p5);animation:typingDot 1.2s ease-in-out infinite;}
+  .typing span:nth-child(2){animation-delay:.2s;}
+  .typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes typingDot{0%,80%,100%{transform:scale(.6);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+
+  /* input */
+  .chat__input-wrap{border-top:1px solid var(--border);padding:16px;}
+  .chat__input-row{display:flex;gap:10px;align-items:flex-end;}
+  .chat__input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--t0);font-family:var(--f-body);font-size:13px;resize:none;outline:none;min-height:42px;max-height:120px;line-height:1.5;transition:border-color var(--t) var(--ease);}
+  .chat__input::placeholder{color:var(--t40);}
+  .chat__input:focus{border-color:var(--border-h);}
+  .chat__send{width:38px;height:38px;border-radius:50%;background:var(--p4);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--t) var(--ease);color:#fff;}
+  .chat__send:hover{background:var(--p5);transform:scale(1.05);}
+  .chat__send:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .chat__privacy{text-align:center;font-size:10px;color:var(--t40);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:5px;}
+
+  /* ── CONSTELLATION ── */
+  .constellation{position:relative;overflow:hidden;background:radial-gradient(ellipse at 55% 50%, rgba(138,56,245,.08) 0%, transparent 65%);}
+  #star-canvas{position:absolute;inset:0;pointer-events:none;}
+  #constellation-svg{width:100%;height:100%;cursor:crosshair;}
+
+  /* Tooltip */
+  .node-tooltip{position:absolute;background:rgba(10,6,24,.95);border:1px solid var(--border-h);border-radius:12px;padding:12px 16px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .2s ease;max-width:200px;z-index:50;}
+  .node-tooltip.visible{opacity:1;}
+  .node-tooltip__name{font-family:var(--f-head);font-size:14px;font-weight:700;color:var(--t0);margin-bottom:4px;}
+  .node-tooltip__dream{color:var(--t60);line-height:1.5;margin-bottom:8px;font-size:11px;}
+  .node-tooltip__tags{display:flex;flex-wrap:wrap;gap:4px;}
+  .node-tooltip__tag{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:600;background:rgba(138,56,245,.2);color:var(--p6);}
+
+  /* ── ANALYSIS PANEL ── */
+  .analysis{border-left:1px solid var(--border);padding:24px 18px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;background:rgba(255,255,255,.01);}
+  .analysis::-webkit-scrollbar{width:2px;}
+  .analysis__title{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t40);}
+  .analysis__state-label{font-size:10px;color:var(--t40);margin-bottom:4px;margin-top:2px;}
+  .analysis__state-val{font-family:var(--f-head);font-size:18px;font-weight:700;color:var(--p5);}
+  .analysis__row{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;}
+  .analysis__key{font-size:11px;color:var(--t60);}
+  .analysis__val{font-size:11px;font-weight:700;color:var(--t0);}
+  .analysis__bar-wrap{height:3px;background:var(--t10);border-radius:2px;margin-top:4px;}
+  .analysis__bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--p4),var(--p5));transition:width .8s ease;}
+  .analysis__connections{font-family:var(--f-head);font-size:22px;font-weight:700;color:var(--green);margin-top:4px;}
+  .analysis__conn-sub{font-size:11px;color:var(--t40);}
+  .analysis__wave{margin-top:6px;}
+  .analysis__placeholder{font-size:12px;color:var(--t40);line-height:1.6;font-style:italic;}
+
+  /* ── STATS BAR ── */
+  .statsbar{height:64px;flex-shrink:0;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);background:rgba(7,5,15,.95);}
+  .stat{display:flex;align-items:center;gap:12px;padding:0 20px;border-right:1px solid var(--border);}
+  .stat:last-child{border-right:none;}
+  .stat__icon{width:36px;height:36px;border-radius:10px;background:rgba(138,56,245,.12);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--p5);flex-shrink:0;}
+  .stat__label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t40);}
+  .stat__val{font-family:var(--f-head);font-size:18px;font-weight:700;color:var(--t0);line-height:1;}
+  .stat__delta{font-size:10px;color:var(--green);margin-top:1px;}
+
+  /* ── AMBIENT STARS ── */
+  .scene-star{position:absolute;border-radius:50%;background:white;pointer-events:none;}
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="sleep-stock.html" class="topbar__back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Volver a la web
+  </a>
+  <div class="topbar__brand">
+    <div class="topbar__logo">
+      <svg width="18" height="18" viewBox="0 0 283 90" fill="none">
+        <path d="M56 75L55 75C53 75 51 75 49 75V42L7 42L7 75L0 75V2H7L7 36L49 36V2H56L56 75Z" fill="#8A38F5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="topbar__name">Fever</div>
+      <div class="topbar__sub">Tu asistente de sueños</div>
+    </div>
+  </div>
+  <div class="topbar__live">
+    <span class="live-dot"></span>
+    En vivo
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- CHAT -->
+  <aside class="chat">
+    <div class="chat__msgs" id="chat-msgs">
+      <!-- Initial AI message -->
+      <div class="msg">
+        <div class="msg__avatar msg__avatar--ai">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a5 5 0 015 5c0 2.5-1.5 4.5-3.5 5.4V14h-3v-1.6C8.5 11.5 7 9.5 7 7a5 5 0 015-5z"/><rect x="9" y="14" width="6" height="2" rx="1"/><rect x="10" y="16" width="4" height="3" rx="1"/></svg>
+        </div>
+        <div class="msg__body">
+          <div class="msg__meta">Fever · ahora</div>
+          <div class="msg__bubble msg__bubble--ai">Hola. Soy Fever, tu asistente de sueños.<br><br>Para comenzar, <strong>¿cómo te llamás?</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="chat__input-wrap">
+      <div class="chat__input-row">
+        <textarea class="chat__input" id="chat-input" placeholder="Escribí acá..." rows="1"></textarea>
+        <button class="chat__send" id="chat-send" aria-label="Enviar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="chat__privacy">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Tus sueños son anónimos y seguros
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONSTELLATION -->
+  <div class="constellation" id="constellation">
+    <canvas id="star-canvas"></canvas>
+    <svg id="constellation-svg" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <!-- Cluster glows -->
+        <radialGradient id="gLucidez"><stop offset="0%" stop-color="#9d50ff" stop-opacity=".9"/><stop offset="100%" stop-color="#9d50ff" stop-opacity="0"/></radialGradient>
+        <radialGradient id="gParalisis"><stop offset="0%" stop-color="#60a5fa" stop-opacity=".9"/><stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/></radialGradient>
+        <radialGradient id="gPesadilla"><stop offset="0%" stop-color="#f87171" stop-opacity=".9"/><stop offset="100%" stop-color="#f87171" stop-opacity="0"/></radialGradient>
+        <radialGradient id="gCatastrofe"><stop offset="0%" stop-color="#fbbf24" stop-opacity=".9"/><stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/></radialGradient>
+        <radialGradient id="gSurrealismo"><stop offset="0%" stop-color="#34d399" stop-opacity=".9"/><stop offset="100%" stop-color="#34d399" stop-opacity="0"/></radialGradient>
+        <radialGradient id="gEmotivo"><stop offset="0%" stop-color="#f472b6" stop-opacity=".9"/><stop offset="100%" stop-color="#f472b6" stop-opacity="0"/></radialGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="glowStrong"><feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <g id="map-root" transform="translate(0,0) scale(1)">
+      <!-- Connection lines layer -->
+      <g id="lines-layer"></g>
+
+      <!-- Cluster nodes -->
+      <g id="clusters-layer">
+        <!-- Lucidez -->
+        <g class="cluster-node" data-cluster="lucidez" style="cursor:pointer;">
+          <circle cx="600" cy="130" r="36" fill="url(#gLucidez)" opacity=".25"/>
+          <circle cx="600" cy="130" r="20" fill="rgba(157,80,255,.15)" stroke="rgba(157,80,255,.5)" stroke-width="1.5" filter="url(#glow)"/>
+          <circle cx="600" cy="130" r="8" fill="#9d50ff" filter="url(#glowStrong)"/>
+          <text x="600" y="163" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="11" font-family="Inter,sans-serif" font-weight="600">Lucidez</text>
+          <text id="cnt-lucidez" x="600" y="176" text-anchor="middle" fill="rgba(157,80,255,.7)" font-size="9" font-family="Inter,sans-serif">0 soñadores</text>
+        </g>
+        <!-- Parálisis -->
+        <g class="cluster-node" data-cluster="paralisis" style="cursor:pointer;">
+          <circle cx="200" cy="240" r="36" fill="url(#gParalisis)" opacity=".25"/>
+          <circle cx="200" cy="240" r="20" fill="rgba(96,165,250,.15)" stroke="rgba(96,165,250,.5)" stroke-width="1.5" filter="url(#glow)"/>
+          <circle cx="200" cy="240" r="8" fill="#60a5fa" filter="url(#glowStrong)"/>
+          <text x="200" y="273" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="11" font-family="Inter,sans-serif" font-weight="600">Parálisis</text>
+          <text id="cnt-paralisis" x="200" y="286" text-anchor="middle" fill="rgba(96,165,250,.7)" font-size="9" font-family="Inter,sans-serif">0 soñadores</text>
+        </g>
+        <!-- Catástrofe -->
+        <g class="cluster-node" data-cluster="catastrofe" style="cursor:pointer;">
+          <circle cx="680" cy="320" r="36" fill="url(#gCatastrofe)" opacity=".25"/>
+          <circle cx="680" cy="320" r="20" fill="rgba(251,191,36,.15)" stroke="rgba(251,191,36,.5)" stroke-width="1.5" filter="url(#glow)"/>
+          <circle cx="680" cy="320" r="8" fill="#fbbf24" filter="url(#glowStrong)"/>
+          <text x="680" y="353" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="11" font-family="Inter,sans-serif" font-weight="600">Catástrofe</text>
+          <text id="cnt-catastrofe" x="680" y="366" text-anchor="middle" fill="rgba(251,191,36,.7)" font-size="9" font-family="Inter,sans-serif">0 soñadores</text>
+        </g>
+        <!-- Pesadilla -->
+        <g class="cluster-node" data-cluster="pesadilla" style="cursor:pointer;">
+          <circle cx="240" cy="430" r="36" fill="url(#gPesadilla)" opacity=".25"/>
+          <circle cx="240" cy="430" r="20" fill="rgba(248,113,113,.15)" stroke="rgba(248,113,113,.5)" stroke-width="1.5" filter="url(#glow)"/>
+          <circle cx="240" cy="430" r="8" fill="#f87171" filter="url(#glowStrong)"/>
+          <text x="240" y="463" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="11" font-family="Inter,sans-serif" font-weight="600">Pesadilla</text>
+          <text id="cnt-pesadilla" x="240" y="476" text-anchor="middle" fill="rgba(248,113,113,.7)" font-size="9" font-family="Inter,sans-serif">0 soñadores</text>
+        </g>
+        <!-- Surrealismo -->
+        <g class="cluster-node" data-cluster="surrealismo" style="cursor:pointer;">
+          <circle cx="580" cy="460" r="36" fill="url(#gSurrealismo)" opacity=".25"/>
+          <circle cx="580" cy="460" r="20" fill="rgba(52,211,153,.15)" stroke="rgba(52,211,153,.5)" stroke-width="1.5" filter="url(#glow)"/>
+          <circle cx="580" cy="460" r="8" fill="#34d399" filter="url(#glowStrong)"/>
+          <text x="580" y="493" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="11" font-family="Inter,sans-serif" font-weight="600">Surrealismo</text>
+          <text id="cnt-surrealismo" x="580" y="506" text-anchor="middle" fill="rgba(52,211,153,.7)" font-size="9" font-family="Inter,sans-serif">0 soñadores</text>
+        </g>
+        <!-- Emotivo -->
+        <g class="cluster-node" data-cluster="emotivo" style="cursor:pointer;">
+          <circle cx="390" cy="110" r="36" fill="url(#gEmotivo)" opacity=".25"/>
+          <circle cx="390" cy="110" r="20" fill="rgba(244,114,182,.15)" stroke="rgba(244,114,182,.5)" stroke-width="1.5" filter="url(#glow)"/>
+          <circle cx="390" cy="110" r="8" fill="#f472b6" filter="url(#glowStrong)"/>
+          <text x="390" y="143" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="11" font-family="Inter,sans-serif" font-weight="600">Emotivo</text>
+          <text id="cnt-emotivo" x="390" y="156" text-anchor="middle" fill="rgba(244,114,182,.7)" font-size="9" font-family="Inter,sans-serif">0 soñadores</text>
+        </g>
+      </g>
+
+      <!-- User nodes layer -->
+      <g id="users-layer"></g>
+
+      <g id="vos-node"></g><!-- placeholder, unused -->
+      </g><!-- /map-root -->
+    </svg>
+
+    <!-- Reset map button -->
+    <div style="position:absolute;top:14px;left:14px;z-index:10;">
+      <button id="btn-reset-map" style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(7,5,15,.8);border:1px solid rgba(138,56,245,.25);border-radius:100px;color:rgba(255,255,255,.45);font-size:10px;font-weight:600;font-family:'Inter',sans-serif;letter-spacing:.08em;cursor:pointer;transition:all .2s ease;backdrop-filter:blur(8px);" onmouseenter="this.style.borderColor='rgba(248,113,113,.5)';this.style.color='rgba(248,113,113,.8)'" onmouseleave="this.style.borderColor='rgba(138,56,245,.25)';this.style.color='rgba(255,255,255,.45)'">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z" opacity=".3"/><path d="M3 12a9 9 0 019-9"/><path d="M3 7v5h5"/></svg>
+        Reiniciar mapa
+      </button>
+    </div>
+
+    <!-- Zoom controls -->
+    <div style="position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px;z-index:10;">
+      <button id="zoom-in"  style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(138,56,245,.3);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseenter="this.style.background='rgba(138,56,245,.2)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">+</button>
+      <button id="zoom-out" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(138,56,245,.3);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseenter="this.style.background='rgba(138,56,245,.2)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">−</button>
+      <button id="zoom-reset" title="Resetear vista" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(138,56,245,.3);color:rgba(255,255,255,.5);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseenter="this.style.background='rgba(138,56,245,.2)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">⊙</button>
+    </div>
+
+    <!-- Hover tooltip -->
+    <div class="node-tooltip" id="node-tooltip">
+      <div class="node-tooltip__name" id="tt-name"></div>
+      <div class="node-tooltip__dream" id="tt-dream"></div>
+      <div class="node-tooltip__tags" id="tt-tags"></div>
+    </div>
+
+    <!-- Toggle view button (top-right) -->
+    <div style="position:absolute;top:14px;right:14px;z-index:20;">
+      <button id="btn-toggle-view" style="display:flex;align-items:center;gap:8px;padding:7px 16px;background:linear-gradient(135deg,rgba(138,56,245,.35),rgba(185,111,255,.2));border:1px solid rgba(138,56,245,.55);border-radius:100px;color:#c4b5fd;font-size:11px;font-weight:700;font-family:'Space Grotesk',sans-serif;letter-spacing:.06em;cursor:pointer;transition:all .2s ease;backdrop-filter:blur(8px);" onmouseenter="this.style.background='linear-gradient(135deg,rgba(138,56,245,.55),rgba(185,111,255,.35))';this.style.borderColor='rgba(185,111,255,.8)';this.style.color='#fff'" onmouseleave="this.style.background='linear-gradient(135deg,rgba(138,56,245,.35),rgba(185,111,255,.2))';this.style.borderColor='rgba(138,56,245,.55)';this.style.color='#c4b5fd'">
+        <svg id="toggle-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="8" width="7" height="13" rx="1"/></svg>
+        <span id="toggle-label">Ver mercado</span>
+      </button>
+    </div>
+
+    <!-- MARKET VIEW (hidden by default) -->
+    <div id="market-view" style="display:none;position:absolute;inset:0;background:radial-gradient(ellipse at 60% 30%,rgba(138,56,245,.10) 0%,transparent 65%),#07050f;overflow-y:auto;z-index:15;padding:56px 16px 28px;">
+      <div>
+        <!-- Header -->
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">
+          <div>
+            <h2 style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:-.02em;">MERCADO ONÍRICO EN VIVO</h2>
+            <p style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;">Sleep Stock — Activos oníricos en tiempo real</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#22c55e;">
+            <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:blink 1.5s ease-in-out infinite;display:inline-block;"></span>
+            Mercado abierto
+          </div>
+        </div>
+
+        <!-- Table header -->
+        <div style="display:grid;grid-template-columns:36px 1fr 90px 70px 110px;gap:0;border-bottom:1px solid rgba(138,56,245,.2);padding:10px 0;margin-top:16px;">
+          <span style="font-size:9px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.5);text-transform:uppercase;">#</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.5);text-transform:uppercase;">ACTIVO ONÍRICO</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.5);text-transform:uppercase;text-align:right;">VALOR</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.5);text-transform:uppercase;text-align:right;">VAR.</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.5);text-transform:uppercase;text-align:right;">TENDENCIA</span>
+        </div>
+
+        <!-- Rows injected by JS -->
+        <div id="market-rows"></div>
+
+        <!-- Chart -->
+        <div style="margin-top:28px;border-top:1px solid rgba(138,56,245,.12);padding-top:22px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:14px;">RENDIMIENTO COMPARATIVO (24H)</div>
+          <div style="position:relative;height:160px;">
+            <svg id="market-chart" width="100%" height="160" viewBox="0 0 860 160" preserveAspectRatio="none">
+              <!-- Grid lines -->
+              <line x1="0" y1="20"  x2="860" y2="20"  stroke="rgba(138,56,245,.08)" stroke-width="1"/>
+              <line x1="0" y1="56"  x2="860" y2="56"  stroke="rgba(138,56,245,.08)" stroke-width="1"/>
+              <line x1="0" y1="92"  x2="860" y2="92"  stroke="rgba(138,56,245,.08)" stroke-width="1"/>
+              <line x1="0" y1="128" x2="860" y2="128" stroke="rgba(138,56,245,.08)" stroke-width="1"/>
+              <!-- Zero line -->
+              <line x1="0" y1="80" x2="860" y2="80" stroke="rgba(138,56,245,.25)" stroke-width="1" stroke-dasharray="4 4"/>
+              <!-- Y labels -->
+              <text x="0" y="18"  fill="rgba(255,255,255,.25)" font-size="9" font-family="JetBrains Mono,monospace">+20%</text>
+              <text x="0" y="54"  fill="rgba(255,255,255,.25)" font-size="9" font-family="JetBrains Mono,monospace">+10%</text>
+              <text x="0" y="84"  fill="rgba(255,255,255,.25)" font-size="9" font-family="JetBrains Mono,monospace">0%</text>
+              <text x="0" y="126" fill="rgba(255,255,255,.25)" font-size="9" font-family="JetBrains Mono,monospace">-10%</text>
+              <!-- X labels -->
+              <text x="50"  y="155" fill="rgba(255,255,255,.2)" font-size="9" font-family="JetBrains Mono,monospace">00:00</text>
+              <text x="200" y="155" fill="rgba(255,255,255,.2)" font-size="9" font-family="JetBrains Mono,monospace">06:00</text>
+              <text x="380" y="155" fill="rgba(255,255,255,.2)" font-size="9" font-family="JetBrains Mono,monospace">12:00</text>
+              <text x="560" y="155" fill="rgba(255,255,255,.2)" font-size="9" font-family="JetBrains Mono,monospace">18:00</text>
+              <text x="740" y="155" fill="rgba(255,255,255,.2)" font-size="9" font-family="JetBrains Mono,monospace">24:00</text>
+              <!-- Chart lines injected by JS -->
+              <g id="chart-lines"></g>
+            </svg>
+          </div>
+          <!-- Legend -->
+          <div id="chart-legend" style="display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ANALYSIS PANEL -->
+  <aside class="analysis" id="analysis-panel">
+    <div>
+      <div class="analysis__title">Análisis de tu sueño</div>
+      <div id="analysis-content">
+        <div style="margin-top:20px;" class="analysis__placeholder">Contale tu sueño a Fever para ver tu análisis onírico en tiempo real.</div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- STATS BAR -->
+<footer class="statsbar">
+  <div class="stat">
+    <div class="stat__icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <div>
+      <div class="stat__label">Soñadores conectados</div>
+      <div class="stat__val" id="stat-dreamers">12.842</div>
+      <div class="stat__delta">● En tiempo real</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat__icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+    </div>
+    <div>
+      <div class="stat__label">Constelaciones activas</div>
+      <div class="stat__val" id="stat-constellations">6</div>
+      <div class="stat__delta">● Temáticas ON</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat__icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <div>
+      <div class="stat__label">Sueños procesados hoy</div>
+      <div class="stat__val" id="stat-dreams">3.271</div>
+      <div class="stat__delta" style="color:#22c55e;">▲ 18.7% vs ayer</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat__icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </div>
+    <div>
+      <div class="stat__label" id="stat-cta-label">Tu sueño ya está generando conexiones.</div>
+      <div style="font-size:11px;color:var(--t40);margin-top:2px;">Cuanto más soñamos juntos, más entendemos.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ══════════════════════════════════
+     THEME DEFINITIONS
+  ══════════════════════════════════ */
+  var CLUSTERS = {
+    lucidez:     { label:'Lucidez',     color:'#9d50ff', cx:600, cy:130, keywords:['sé que estoy soñando','sabía que soñaba','lúcido','lucidez','me di cuenta de que soñaba','sabía que era un sueño','controlar el sueño','despertar dentro del sueño','bucle','bucle de sueños','despertar falso'] },
+    paralisis:   { label:'Parálisis',   color:'#60a5fa', cx:200, cy:240, keywords:['no podía moverme','paralizado','parálisis','no podía gritar','intenté gritar','no me salía la voz','inmovilizado','atrapado sin moverme','figura oscura encima','presencia encima','no podía despertar'] },
+    catastrofe:  { label:'Catástrofe',  color:'#fbbf24', cx:680, cy:320, keywords:['terremoto','tsunami','ola gigante','apocalipsis','guerra','bomba','nuclear','incendio','fuego','desastre','evacuación','fin del mundo','inundación','derrumbe','explosión'] },
+    pesadilla:   { label:'Pesadilla',   color:'#f87171', cx:240, cy:430, keywords:['perseguía','persecución','escapar','huir','corría','monstruo','criatura','amenaza','asustado','terror','miedo','oscuridad','trampa','atrapado','peligro'] },
+    surrealismo: { label:'Surrealismo', color:'#34d399', cx:580, cy:460, keywords:['extraño','raro','absurdo','imposible','bizarro','sin sentido','hablaba un animal','animal hablaba','objeto animado','cielo de otro color','leyes de la física','distorsión','transformó','se convirtió','mezcla de lugares'] },
+    emotivo:     { label:'Emotivo',     color:'#f472b6', cx:390, cy:110, keywords:['lloré','lloraba','me desperté llorando','emocionado','emoción','nostalgia','extrañaba','extrañé','familiar fallecido','abuelo','abuela','mamá','papá','tía','tío','amigo que perdí','me partió el corazón','tristeza','feliz al despertar'] }
+  };
+
+  /* ══════════════════════════════════
+     STATE
+  ══════════════════════════════════ */
+  var state = {
+    step: 'name',        // 'name' | 'dream' | 'done'
+    userName: '',
+    userDream: '',
+    userThemes: [],
+    users: JSON.parse(localStorage.getItem('hypn_users') || '[]'),
+    clusterCounts: JSON.parse(localStorage.getItem('hypn_counts') || '{}')
+  };
+
+  /* ══════════════════════════════════
+     AMBIENT STARS
+  ══════════════════════════════════ */
+  var canvas = document.getElementById('star-canvas');
+  var constEl = document.getElementById('constellation');
+  function resizeCanvas(){
+    canvas.width = constEl.offsetWidth;
+    canvas.height = constEl.offsetHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  var ctx = canvas.getContext('2d');
+  var stars = Array.from({length:80}, function(){
+    return { x:Math.random(), y:Math.random(), r:Math.random()*1.2+0.2, a:Math.random(), speed:Math.random()*.003+.001 };
+  });
+  function drawStars(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(function(s){
+      s.a += s.speed;
+      var alpha = (Math.sin(s.a)+1)/2 * 0.6 + 0.1;
+      ctx.beginPath();
+      ctx.arc(s.x*canvas.width, s.y*canvas.height, s.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,'+alpha+')';
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  /* ══════════════════════════════════
+     KEYWORD ANALYSIS
+  ══════════════════════════════════ */
+  function analyzeDream(text) {
+    var lower = text.toLowerCase();
+    var matched = [];
+    Object.keys(CLUSTERS).forEach(function(key){
+      var cluster = CLUSTERS[key];
+      var score = 0;
+      cluster.keywords.forEach(function(kw){ if(lower.includes(kw)) score++; });
+      if(score > 0) matched.push({ key:key, score:score });
+    });
+    matched.sort(function(a,b){ return b.score - a.score; });
+    if(matched.length === 0) {
+      // fallback: pick a random cluster
+      var keys = Object.keys(CLUSTERS);
+      matched = [{ key: keys[Math.floor(Math.random()*keys.length)], score:1 }];
+    }
+    return matched.slice(0,3).map(function(m){ return m.key; });
+  }
+
+  function detectEmotion(themes){
+    if(themes.includes('ansiedad')) return { state:'PROCESAMIENTO EMOCIONAL', lucidez: Math.floor(30+Math.random()*20) };
+    if(themes.includes('libertad') && themes.includes('vuelo')) return { state:'REM EXPANSIVO', lucidez: Math.floor(70+Math.random()*20) };
+    if(themes.includes('amor')) return { state:'REM AFECTIVO', lucidez: Math.floor(60+Math.random()*20) };
+    if(themes.includes('vuelo')) return { state:'REM PROFUNDO', lucidez: Math.floor(65+Math.random()*20) };
+    if(themes.includes('agua')) return { state:'REM FLUIDO', lucidez: Math.floor(55+Math.random()*25) };
+    if(themes.includes('casa')) return { state:'NREM PROFUNDO', lucidez: Math.floor(40+Math.random()*25) };
+    return { state:'REM PROFUNDO', lucidez: Math.floor(50+Math.random()*30) };
+  }
+
+  /* ══════════════════════════════════
+     CONSTELLATION RENDERING
+  ══════════════════════════════════ */
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var linesLayer = document.getElementById('lines-layer');
+  var usersLayer = document.getElementById('users-layer');
+  var tooltip = document.getElementById('node-tooltip');
+  var svgEl = document.getElementById('constellation-svg');
+
+  // Positions for user nodes — distributed around center
+  var USER_POSITIONS = [
+    {x:400,y:290},{x:460,y:220},{x:340,y:190},{x:470,y:350},{x:330,y:360},
+    {x:410,y:160},{x:490,y:290},{x:310,y:280},{x:450,y:400},{x:350,y:420},
+    {x:520,y:200},{x:280,y:320},{x:440,y:140},{x:370,y:350},{x:500,y:360},
+    {x:320,y:220},{x:480,y:160},{x:280,y:390},{x:540,y:340},{x:360,y:160}
+  ];
+
+  function getUserPos(index) {
+    if(index < USER_POSITIONS.length) return USER_POSITIONS[index];
+    var angle = (index / 12) * Math.PI * 2;
+    var r = 80 + (index % 3) * 30;
+    return { x: 400 + Math.cos(angle)*r, y: 290 + Math.sin(angle)*r };
+  }
+
+  function renderConstellation() {
+    // Clear
+    while(linesLayer.firstChild) linesLayer.removeChild(linesLayer.firstChild);
+    while(usersLayer.firstChild) usersLayer.removeChild(usersLayer.firstChild);
+
+    // Update cluster counts
+    Object.keys(CLUSTERS).forEach(function(key){
+      var cnt = state.clusterCounts[key] || 0;
+      var el = document.getElementById('cnt-'+key);
+      if(el) el.textContent = cnt + ' soñador' + (cnt===1?'':'es');
+    });
+
+    // Draw user nodes + lines
+    state.users.forEach(function(user, i){
+      var pos = getUserPos(i);
+      var color = '#c4b5fd';
+
+      // Lines to clusters
+      user.themes.forEach(function(themeKey){
+        var cluster = CLUSTERS[themeKey];
+        if(!cluster) return;
+        var line = document.createElementNS(svgNS,'line');
+        line.setAttribute('x1', pos.x); line.setAttribute('y1', pos.y);
+        line.setAttribute('x2', cluster.cx); line.setAttribute('y2', cluster.cy);
+        line.setAttribute('stroke', cluster.color);
+        line.setAttribute('stroke-opacity','0.25');
+        line.setAttribute('stroke-width','1');
+        line.setAttribute('stroke-dasharray','3 4');
+        line.setAttribute('data-cluster', themeKey);
+        linesLayer.appendChild(line);
+      });
+
+      // User node
+      var g = document.createElementNS(svgNS,'g');
+      g.setAttribute('class','user-node');
+      g.setAttribute('data-themes', (user.themes||[]).join(','));
+      g.style.cursor = 'pointer';
+
+      var glow = document.createElementNS(svgNS,'circle');
+      glow.setAttribute('cx',pos.x); glow.setAttribute('cy',pos.y);
+      glow.setAttribute('r','14'); glow.setAttribute('fill',color); glow.setAttribute('opacity','.08');
+      g.appendChild(glow);
+
+      var ring = document.createElementNS(svgNS,'circle');
+      ring.setAttribute('cx',pos.x); ring.setAttribute('cy',pos.y);
+      ring.setAttribute('r','8'); ring.setAttribute('fill','rgba(196,181,253,.12)');
+      ring.setAttribute('stroke',color); ring.setAttribute('stroke-width','1.5');
+      g.appendChild(ring);
+
+      var dot = document.createElementNS(svgNS,'circle');
+      dot.setAttribute('cx',pos.x); dot.setAttribute('cy',pos.y);
+      dot.setAttribute('r','4'); dot.setAttribute('fill',color);
+      g.appendChild(dot);
+
+      var label = document.createElementNS(svgNS,'text');
+      label.setAttribute('x',pos.x); label.setAttribute('y',pos.y+20);
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('fill','rgba(196,181,253,.7)');
+      label.setAttribute('font-size','9');
+      label.setAttribute('font-family','Inter,sans-serif');
+      label.setAttribute('font-weight','600');
+      label.textContent = user.name.split(' ')[0];
+      g.appendChild(label);
+
+      // Hover + Click
+      g.addEventListener('mouseenter', function(e){ showTooltip(e, user, pos); });
+      g.addEventListener('mousemove', function(e){ moveTooltip(e); });
+      g.addEventListener('mouseleave', function(){ hideTooltip(); });
+      (function(u){ g.addEventListener('click', function(e){ e.stopPropagation(); showUserPanel(u); }); })(user);
+
+      usersLayer.appendChild(g);
+    });
+
+    // Show VOS node if current user has submitted
+    if(state.step === 'done') {
+      document.getElementById('vos-node').style.opacity = '1';
+    }
+  }
+
+  function showTooltip(e, user, pos) {
+    document.getElementById('tt-name').textContent = user.name;
+    document.getElementById('tt-dream').textContent = user.dream.length > 90
+      ? user.dream.substring(0,90)+'…'
+      : user.dream;
+    var tagsEl = document.getElementById('tt-tags');
+    tagsEl.innerHTML = '';
+    user.themes.forEach(function(t){
+      var span = document.createElement('span');
+      span.className = 'node-tooltip__tag';
+      span.textContent = CLUSTERS[t] ? CLUSTERS[t].label : t;
+      tagsEl.appendChild(span);
+    });
+    moveTooltip(e);
+    tooltip.classList.add('visible');
+  }
+  function moveTooltip(e) {
+    var rect = constEl.getBoundingClientRect();
+    var x = e.clientX - rect.left + 16;
+    var y = e.clientY - rect.top - 20;
+    if(x + 210 > rect.width) x = e.clientX - rect.left - 220;
+    tooltip.style.left = x+'px';
+    tooltip.style.top = y+'px';
+  }
+  function hideTooltip(){ tooltip.classList.remove('visible'); }
+
+  /* ══════════════════════════════════
+     CHAT LOGIC
+  ══════════════════════════════════ */
+  var msgsEl = document.getElementById('chat-msgs');
+  var inputEl = document.getElementById('chat-input');
+  var sendBtn = document.getElementById('chat-send');
+  var messageCount = 0;
+
+  function now(){
+    var d=new Date(); var h=d.getHours(); var m=d.getMinutes();
+    return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+  }
+
+  function addMessage(role, content, tags, footer) {
+    var div = document.createElement('div');
+    div.className = 'msg' + (role==='user'?' msg--user':'');
+    var avatarHtml = role==='ai'
+      ? '<div class="msg__avatar msg__avatar--ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a5 5 0 015 5c0 2.5-1.5 4.5-3.5 5.4V14h-3v-1.6C8.5 11.5 7 9.5 7 7a5 5 0 015-5z"/><rect x="9" y="14" width="6" height="2" rx="1"/><rect x="10" y="16" width="4" height="3" rx="1"/></svg></div>'
+      : '<div class="msg__avatar msg__avatar--user">'+(state.userName?state.userName[0].toUpperCase():'V')+'</div>';
+    var metaName = role==='ai' ? 'Fever' : 'VOS';
+    var tagsHtml = '';
+    if(tags && tags.length){
+      tagsHtml = '<div class="msg__tags">'+ tags.map(function(t){ return '<span class="msg__tag">'+t+'</span>'; }).join('') +'</div>';
+    }
+    var footerHtml = '';
+    if(footer){
+      footerHtml = '<div class="msg__footer"><span class="msg__connected">● '+footer.left+'</span><span class="msg__connections">'+footer.right+'</span></div>';
+    }
+    div.innerHTML = avatarHtml + '<div class="msg__body"><div class="msg__meta">'+metaName+' · '+now()+'</div><div class="msg__bubble msg__bubble--'+role+'">'+content+'</div>'+tagsHtml+footerHtml+'</div>';
+    msgsEl.appendChild(div);
+    requestAnimationFrame(function(){ msgsEl.scrollTop = msgsEl.scrollHeight; });
+  }
+
+  function showTyping(cb) {
+    var div = document.createElement('div');
+    div.className = 'msg';
+    div.id = 'typing-indicator';
+    div.innerHTML = '<div class="msg__avatar msg__avatar--ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a5 5 0 015 5c0 2.5-1.5 4.5-3.5 5.4V14h-3v-1.6C8.5 11.5 7 9.5 7 7a5 5 0 015-5z"/><rect x="9" y="14" width="6" height="2" rx="1"/><rect x="10" y="16" width="4" height="3" rx="1"/></svg></div><div class="msg__body"><div class="msg__bubble msg__bubble--ai"><div class="typing"><span></span><span></span><span></span></div></div></div>';
+    msgsEl.appendChild(div);
+    requestAnimationFrame(function(){ msgsEl.scrollTop = msgsEl.scrollHeight; });
+    sendBtn.disabled = true;
+    setTimeout(function(){
+      var ind = document.getElementById('typing-indicator');
+      if(ind) ind.remove();
+      sendBtn.disabled = false;
+      cb();
+    }, 1400 + Math.random()*800);
+  }
+
+  function handleSend() {
+    var text = inputEl.value.trim();
+    if(!text) return;
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+
+    if(state.step === 'name') {
+      // Smart name extraction
+      var extractedName = text.trim();
+      var lower = text.toLowerCase().trim();
+      var patterns = [
+        /^(?:me llamo|mi nombre es|soy|me dicen|me llaman|llámame|llamame)\s+([a-záéíóúüñ]+(?:\s+[a-záéíóúüñ]+)?)/i,
+      ];
+      for(var pi=0; pi<patterns.length; pi++){
+        var m = lower.match(patterns[pi]);
+        if(m && m[1]) {
+          // Capitalize properly from original text
+          var idx = lower.indexOf(m[1]);
+          extractedName = text.substring(idx, idx+m[1].length);
+          extractedName = extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
+          break;
+        }
+      }
+      // Fallback: if still looks like a sentence (has verb words), take first capitalized word
+      if(extractedName === text.trim() && text.trim().split(' ').length > 2) {
+        var words = text.trim().split(' ');
+        for(var wi=0; wi<words.length; wi++){
+          var w = words[wi].replace(/[^a-záéíóúüña-z]/gi,'');
+          if(w.length > 1 && !/^(me|mi|soy|es|se|de|un|una|el|la|y|que|lo|le)$/i.test(w)){
+            extractedName = w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            break;
+          }
+        }
+      }
+      state.userName = extractedName;
+      addMessage('user', text);
+      showTyping(function(){
+        addMessage('ai', 'Perfecto, <strong>'+extractedName+'</strong>. Ahora contame tu sueño con la mayor cantidad de detalle que puedas. ¿Qué soñaste?');
+        state.step = 'dream';
+        inputEl.placeholder = 'Describí tu sueño...';
+      });
+
+    } else if(state.step === 'dream') {
+      state.userDream = text;
+      addMessage('user', text);
+      state.step = 'processing';
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+
+      showTyping(function(){
+        addMessage('ai', 'Gracias por compartir tu sueño. Voy a analizarlo y conectarte con constelaciones en tiempo real.');
+        setTimeout(function(){
+          showTyping(function(){
+            // Analyze
+            var themes = analyzeDream(state.userDream);
+            state.userThemes = themes;
+            var emotion = detectEmotion(themes);
+            var themeLabels = themes.map(function(t){ return CLUSTERS[t] ? CLUSTERS[t].label : t; });
+
+            // Count connections
+            var totalConnections = 0;
+            themes.forEach(function(t){ totalConnections += (state.clusterCounts[t]||0); });
+
+            // Add to users
+            state.users.push({ name:state.userName, dream:state.userDream, themes:themes, emotion:emotion, lucidez:emotion.lucidez });
+            themes.forEach(function(t){ state.clusterCounts[t] = (state.clusterCounts[t]||0)+1; });
+            localStorage.setItem('hypn_users', JSON.stringify(state.users));
+            localStorage.setItem('hypn_counts', JSON.stringify(state.clusterCounts));
+
+            // AI response with tags
+            var connMsg = totalConnections > 0
+              ? 'Te conecté con <strong>'+totalConnections+' soñadores</strong> en las constelaciones de '+themeLabels.map(function(t,i){ return '<span style="color:var(--p6)">'+t+'</span>'; }).join(', ')+'.'
+              : 'Fuiste el primero en explorar estas constelaciones. Pronto más soñadores se conectarán con vos.';
+
+            addMessage('ai',
+              'He detectado las variables principales en tu sueño:<br><br>'+connMsg,
+              themeLabels,
+              { left:'Conectado en vivo', right: totalConnections+' conexiones activas' }
+            );
+
+            // Update analysis panel
+            updateAnalysis(emotion, themes, totalConnections, themeLabels);
+
+            // Render constellation + refresh market
+            renderConstellation();
+            renderMarket();
+            document.getElementById('vos-node').style.opacity = '1';
+
+            state.step = 'done';
+            inputEl.disabled = false;
+            sendBtn.disabled = false;
+            inputEl.placeholder = 'Seguí explorando...';
+
+            // Follow-up message + "Fin del sueño" button
+            setTimeout(function(){
+              showTyping(function(){
+                addMessage('ai', 'Tu nodo ya aparece en la constelación. Podés pasar el cursor sobre cualquier punto para ver los sueños de otros participantes. 🌌');
+                // Add "Fin del sueño" action card
+                setTimeout(function(){
+                  var card = document.createElement('div');
+                  card.id = 'fin-card';
+                  card.style.cssText = 'padding:0 0 0 42px;animation:fadeUp .3s ease;';
+                  card.innerHTML =
+                    '<button id="btn-fin-sueno" style="width:100%;padding:13px 18px;background:linear-gradient(135deg,rgba(138,56,245,.15),rgba(185,111,255,.1));border:1px solid rgba(138,56,245,.4);border-radius:14px;color:#c4b5fd;font-family:\'Space Grotesk\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s ease;letter-spacing:-.01em;" '+
+                    'onmouseenter="this.style.background=\'linear-gradient(135deg,rgba(138,56,245,.28),rgba(185,111,255,.2))\';this.style.borderColor=\'rgba(138,56,245,.7)\'" '+
+                    'onmouseleave="this.style.background=\'linear-gradient(135deg,rgba(138,56,245,.15),rgba(185,111,255,.1))\';this.style.borderColor=\'rgba(138,56,245,.4)\'">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
+                    'Siguiente soñador</button>';
+                  msgsEl.appendChild(card);
+                  requestAnimationFrame(function(){ msgsEl.scrollTop = msgsEl.scrollHeight; });
+
+                  document.getElementById('btn-fin-sueno').addEventListener('click', function(){
+                    // Remove the card
+                    var c = document.getElementById('fin-card');
+                    if(c) c.remove();
+                    // Reset chat state only (keep constellation data)
+                    state.step = 'name';
+                    state.userName = '';
+                    state.userDream = '';
+                    state.userThemes = [];
+                    inputEl.disabled = false;
+                    sendBtn.disabled = false;
+                    inputEl.placeholder = 'Escribí acá...';
+                    // Add separator + new greeting
+                    var sep = document.createElement('div');
+                    sep.style.cssText = 'display:flex;align-items:center;gap:10px;padding:4px 0;';
+                    sep.innerHTML = '<div style="flex:1;height:1px;background:rgba(138,56,245,.15);"></div><span style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.2);white-space:nowrap;">Nuevo soñador</span><div style="flex:1;height:1px;background:rgba(138,56,245,.15);"></div>';
+                    msgsEl.appendChild(sep);
+                    showTyping(function(){
+                      addMessage('ai', 'Hola. Soy Fever, tu asistente de sueños.<br><br>Para comenzar, <strong>¿cómo te llamás?</strong>');
+                    });
+                  });
+                }, 600);
+              });
+            }, 2000);
+          });
+        }, 800);
+      });
+    } else {
+      // Free chat after dream submitted
+      addMessage('user', text);
+      showTyping(function(){
+        var responses = [
+          'Tu sueño sigue procesándose en la red. Cada conexión que se activa revela patrones del inconsciente colectivo.',
+          'Los sueños con temáticas de '+state.userThemes.map(function(t){ return CLUSTERS[t]?CLUSTERS[t].label:t; }).join(' y ')+' suelen estar asociados a momentos de transformación personal.',
+          'Interesante que menciones eso. El inconsciente está constantemente buscando resolver lo que la mente despierta no puede.',
+          'La constelación sigue actualizándose. Mirá cómo tu nodo se conecta con el de otros soñadores en tiempo real.',
+          'Cada sueño que compartimos hace el mapa más completo. Gracias por seguir explorando.'
+        ];
+        addMessage('ai', responses[Math.floor(Math.random()*responses.length)]);
+      });
+    }
+  }
+
+  function showUserPanel(user) {
+    var themes = user.themes || [];
+    var emotion = user.emotion || { state: 'REM PROFUNDO', lucidez: 60 };
+    var neural = emotion.lucidez > 65 ? 'Alta' : emotion.lucidez > 45 ? 'Media' : 'Baja';
+    var totalConn = 0;
+    themes.forEach(function(t){ totalConn += (state.clusterCounts[t]||0) - 1; });
+    totalConn = Math.max(0, totalConn);
+
+    // Highlight selected node (pulse effect via class)
+    document.querySelectorAll('.user-node').forEach(function(n){ n.style.opacity='0.4'; });
+    event && event.currentTarget && (event.currentTarget.style.opacity='1');
+
+    document.getElementById('analysis-content').innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-bottom:14px;border-bottom:1px solid rgba(138,56,245,.15);">'+
+        '<div style="width:36px;height:36px;border-radius:50%;background:rgba(138,56,245,.2);border:1px solid rgba(138,56,245,.4);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#c4b5fd;flex-shrink:0;">'+user.name[0].toUpperCase()+'</div>'+
+        '<div><div style="font-family:var(--f-head);font-size:15px;font-weight:700;color:var(--t0);">'+user.name+'</div>'+
+        '<div style="font-size:10px;color:var(--t40);margin-top:1px;">Soñador conectado</div></div>'+
+      '</div>'+
+      '<div style="margin-top:14px;"><div class="analysis__title" style="margin-bottom:6px;">Sueño registrado</div>'+
+      '<div style="font-size:12px;color:var(--t60);line-height:1.65;background:rgba(255,255,255,.03);border:1px solid rgba(138,56,245,.12);border-radius:10px;padding:10px 12px;">'+user.dream+'</div></div>'+
+      '<div class="analysis__state-label" style="margin-top:16px;">Estado Onírico</div>'+
+      '<div class="analysis__state-val">'+emotion.state+'</div>'+
+      '<div class="analysis__row" style="margin-top:14px;"><span class="analysis__key">Lucidez</span><span class="analysis__val">'+emotion.lucidez+'%</span></div>'+
+      '<div class="analysis__bar-wrap"><div class="analysis__bar" id="bar-lucidez" style="width:0%"></div></div>'+
+      '<div class="analysis__row" style="margin-top:10px;"><span class="analysis__key">Actividad Neural</span><span class="analysis__val">'+neural+'</span></div>'+
+      '<div style="margin-top:16px;"><div class="analysis__title" style="margin-bottom:8px;">Constelaciones</div>'+
+      themes.map(function(t){
+        var c = CLUSTERS[t];
+        var cnt = Math.max(0,(state.clusterCounts[t]||0)-1);
+        return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'+
+          '<div style="display:flex;align-items:center;gap:7px;">'+
+          '<span style="width:8px;height:8px;border-radius:50%;background:'+(c?c.color:'#9d50ff')+';box-shadow:0 0 6px '+(c?c.color:'#9d50ff')+';flex-shrink:0;display:inline-block;"></span>'+
+          '<span style="font-size:12px;color:var(--t80);">'+(c?c.label:t)+'</span></div>'+
+          '<span style="font-size:10px;color:var(--t40);">'+cnt+' más</span></div>';
+      }).join('')+'</div>'+
+      '<div style="margin-top:14px;"><div class="analysis__title">Conexiones</div>'+
+      '<div class="analysis__connections">'+totalConn+' soñadores</div>'+
+      '<div class="analysis__conn-sub">comparten estas constelaciones</div></div>'+
+      '<div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">'+
+      '<button id="btn-valor-onirico" style="width:100%;padding:9px;background:rgba(138,56,245,.18);border:1px solid rgba(138,56,245,.5);border-radius:8px;color:#c4b5fd;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--f-body);letter-spacing:.04em;">✦ Ver mi Valor Onírico</button>'+
+      '<button onclick="document.querySelectorAll(\'.user-node\').forEach(function(n){n.style.opacity=\'1\';})" style="width:100%;padding:8px;background:transparent;border:1px solid rgba(138,56,245,.2);border-radius:8px;color:rgba(167,139,250,.6);font-size:10px;cursor:pointer;font-family:var(--f-body);">Volver a mi análisis</button>'+
+      '</div>';
+
+    setTimeout(function(){
+      var btnV = document.getElementById('btn-valor-onirico');
+      if (btnV) btnV.addEventListener('click', function(){ showValorOnirico(user); });
+    }, 50);
+
+    setTimeout(function(){
+      var bar = document.getElementById('bar-lucidez');
+      if(bar) bar.style.width = emotion.lucidez+'%';
+    }, 80);
+  }
+
+  function updateAnalysis(emotion, themes, connections, themeLabels) {
+    var neural = emotion.lucidez > 65 ? 'Alta' : emotion.lucidez > 45 ? 'Media' : 'Baja';
+    document.getElementById('analysis-content').innerHTML =
+      '<div class="analysis__state-label" style="margin-top:14px;">Estado Onírico Actual</div>'+
+      '<div class="analysis__state-val">'+emotion.state+'</div>'+
+      '<div class="analysis__row" style="margin-top:18px;"><span class="analysis__key">Lucidez</span><span class="analysis__val">'+emotion.lucidez+'%</span></div>'+
+      '<div class="analysis__bar-wrap"><div class="analysis__bar" id="bar-lucidez" style="width:0%"></div></div>'+
+      '<div class="analysis__row"><span class="analysis__key">Actividad Neural</span></div>'+
+      '<div class="analysis__key" style="color:var(--t0);font-weight:700;font-size:12px;">'+neural+'</div>'+
+      '<div class="analysis__wave">'+
+        '<svg width="100%" height="32" viewBox="0 0 200 32" fill="none">'+
+          '<polyline points="0,16 20,8 40,22 60,6 80,24 100,4 120,20 140,10 160,18 180,8 200,16" stroke="rgba(138,56,245,.7)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'+
+        '</svg>'+
+      '</div>'+
+      '<div style="margin-top:14px;"><div class="analysis__title">Conexiones Activas</div>'+
+      '<div class="analysis__connections">'+connections+' soñadores</div>'+
+      '<div class="analysis__conn-sub">en '+(connections>0?themes.length:'0')+' constelaciones</div></div>'+
+      '<div style="margin-top:18px;"><div class="analysis__title" style="margin-bottom:8px;">Constelaciones</div>'+
+      themeLabels.map(function(t,i){
+        var c = CLUSTERS[themes[i]];
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">'+
+          '<span style="width:8px;height:8px;border-radius:50%;background:'+(c?c.color:'#9d50ff')+';box-shadow:0 0 6px '+(c?c.color:'#9d50ff')+';flex-shrink:0;display:inline-block;"></span>'+
+          '<span style="font-size:12px;color:var(--t80);">'+t+'</span></div>';
+      }).join('')+'</div>';
+
+    setTimeout(function(){
+      var bar = document.getElementById('bar-lucidez');
+      if(bar) bar.style.width = emotion.lucidez+'%';
+    }, 100);
+  }
+
+  /* ══════════════════════════════════
+     INPUT AUTO-RESIZE
+  ══════════════════════════════════ */
+  inputEl.addEventListener('input', function(){
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120)+'px';
+  });
+  inputEl.addEventListener('keydown', function(e){
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); handleSend(); }
+  });
+  sendBtn.addEventListener('click', handleSend);
+
+  /* ══════════════════════════════════
+     LIVE STATS TICK
+  ══════════════════════════════════ */
+  var baseDreamers = 12842;
+  var baseDreams = 3271;
+  setInterval(function(){
+    baseDreamers += Math.floor(Math.random()*3);
+    baseDreams += Math.floor(Math.random()*2);
+    document.getElementById('stat-dreamers').textContent = baseDreamers.toLocaleString('es-AR');
+    document.getElementById('stat-dreams').textContent = baseDreams.toLocaleString('es-AR');
+  }, 3000);
+
+  /* ══════════════════════════════════
+     ZOOM + PAN
+  ══════════════════════════════════ */
+  var mapRoot = document.getElementById('map-root');
+  var constSvg = document.getElementById('constellation-svg');
+  var zoom = { scale: 1, tx: 0, ty: 0 };
+  var drag = { active: false, startX: 0, startY: 0, startTx: 0, startTy: 0 };
+  var MIN_SCALE = 0.4, MAX_SCALE = 4;
+
+  function applyTransform() {
+    mapRoot.setAttribute('transform', 'translate('+zoom.tx+','+zoom.ty+') scale('+zoom.scale+')');
+  }
+
+  function zoomAt(cx, cy, factor) {
+    var newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, zoom.scale * factor));
+    var ratio = newScale / zoom.scale;
+    zoom.tx = cx - ratio * (cx - zoom.tx);
+    zoom.ty = cy - ratio * (cy - zoom.ty);
+    zoom.scale = newScale;
+    applyTransform();
+  }
+
+  function getSVGPoint(e) {
+    var rect = constSvg.getBoundingClientRect();
+    var vb = constSvg.viewBox.baseVal;
+    return {
+      x: (e.clientX - rect.left) / rect.width  * vb.width,
+      y: (e.clientY - rect.top)  / rect.height * vb.height
+    };
+  }
+
+  // Wheel zoom
+  constSvg.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var pt = getSVGPoint(e);
+    var factor = e.deltaY < 0 ? 1.12 : 1/1.12;
+    zoomAt(pt.x, pt.y, factor);
+  }, { passive: false });
+
+  // Drag pan
+  constSvg.addEventListener('mousedown', function(e) {
+    if(e.button !== 0) return;
+    drag.active = true;
+    drag.startX = e.clientX; drag.startY = e.clientY;
+    drag.startTx = zoom.tx; drag.startTy = zoom.ty;
+    constSvg.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', function(e) {
+    if(!drag.active) return;
+    var rect = constSvg.getBoundingClientRect();
+    var vb = constSvg.viewBox.baseVal;
+    var scaleX = vb.width / rect.width;
+    var scaleY = vb.height / rect.height;
+    zoom.tx = drag.startTx + (e.clientX - drag.startX) * scaleX;
+    zoom.ty = drag.startTy + (e.clientY - drag.startY) * scaleY;
+    applyTransform();
+  });
+  window.addEventListener('mouseup', function() {
+    drag.active = false;
+    constSvg.style.cursor = 'grab';
+  });
+  constSvg.style.cursor = 'grab';
+
+  // Click on empty map area → deselect nodes, restore own analysis
+  var wasDragging = false;
+  constSvg.addEventListener('mousedown', function(){ wasDragging = false; });
+  window.addEventListener('mousemove', function(){ if(drag.active) wasDragging = true; });
+  constSvg.addEventListener('click', function(e){
+    if(wasDragging) return;
+    if(e.target.closest && e.target.closest('.user-node')) return;
+    if(e.target.closest && e.target.closest('.cluster-node')) return;
+    // Reset focus
+    resetFocus();
+    // Restore own analysis if available
+    if(state.step === 'done' && state.userThemes.length) {
+      var emotion = detectEmotion(state.userThemes);
+      var themeLabels = state.userThemes.map(function(t){ return CLUSTERS[t]?CLUSTERS[t].label:t; });
+      var totalConn = 0;
+      state.userThemes.forEach(function(t){ totalConn += Math.max(0,(state.clusterCounts[t]||0)-1); });
+      updateAnalysis(emotion, state.userThemes, totalConn, themeLabels);
+    } else {
+      document.getElementById('analysis-content').innerHTML='<div style="margin-top:20px;" class="analysis__placeholder">Contale tu sueño a Fever para ver tu análisis onírico en tiempo real.</div>';
+    }
+  });
+
+  // Touch support
+  var lastTouchDist = null;
+  constSvg.addEventListener('touchstart', function(e) {
+    if(e.touches.length === 1) {
+      drag.active = true;
+      drag.startX = e.touches[0].clientX; drag.startY = e.touches[0].clientY;
+      drag.startTx = zoom.tx; drag.startTy = zoom.ty;
+    } else if(e.touches.length === 2) {
+      drag.active = false;
+      lastTouchDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    }
+  }, { passive: true });
+  constSvg.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if(e.touches.length === 1 && drag.active) {
+      var rect = constSvg.getBoundingClientRect();
+      var vb = constSvg.viewBox.baseVal;
+      zoom.tx = drag.startTx + (e.touches[0].clientX - drag.startX) * (vb.width/rect.width);
+      zoom.ty = drag.startTy + (e.touches[0].clientY - drag.startY) * (vb.height/rect.height);
+      applyTransform();
+    } else if(e.touches.length === 2 && lastTouchDist) {
+      var dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+      var cx = (e.touches[0].clientX+e.touches[1].clientX)/2;
+      var cy = (e.touches[0].clientY+e.touches[1].clientY)/2;
+      var pt = getSVGPoint({clientX:cx, clientY:cy});
+      zoomAt(pt.x, pt.y, dist/lastTouchDist);
+      lastTouchDist = dist;
+    }
+  }, { passive: false });
+  constSvg.addEventListener('touchend', function() { drag.active=false; lastTouchDist=null; });
+
+  // Zoom buttons
+  document.getElementById('zoom-in').addEventListener('click', function(){ zoomAt(400,290,1.25); });
+  document.getElementById('zoom-out').addEventListener('click', function(){ zoomAt(400,290,0.8); });
+  document.getElementById('zoom-reset').addEventListener('click', function(){ zoom.scale=1;zoom.tx=0;zoom.ty=0;applyTransform(); });
+
+  document.getElementById('btn-reset-map').addEventListener('click', function(){
+    if(!confirm('¿Reiniciar el mapa? Se borrarán todos los sueños registrados.')) return;
+    localStorage.removeItem('hypn_users');
+    localStorage.removeItem('hypn_counts');
+    state.users = [];
+    state.clusterCounts = {};
+    state.step = 'name';
+    state.userName = '';
+    state.userDream = '';
+    state.userThemes = [];
+    zoom.scale=1; zoom.tx=0; zoom.ty=0; applyTransform();
+    document.getElementById('vos-node').style.opacity = '0';
+    document.getElementById('analysis-content').innerHTML = '<div style="margin-top:20px;" class="analysis__placeholder">Contale tu sueño a Fever para ver tu análisis onírico en tiempo real.</div>';
+    renderConstellation();
+    // Reset chat
+    msgsEl.innerHTML = '';
+    var initDiv = document.createElement('div');
+    initDiv.className = 'msg';
+    initDiv.innerHTML = '<div class="msg__avatar msg__avatar--ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a5 5 0 015 5c0 2.5-1.5 4.5-3.5 5.4V14h-3v-1.6C8.5 11.5 7 9.5 7 7a5 5 0 015-5z"/><rect x="9" y="14" width="6" height="2" rx="1"/><rect x="10" y="16" width="4" height="3" rx="1"/></svg></div><div class="msg__body"><div class="msg__meta">Fever · ahora</div><div class="msg__bubble msg__bubble--ai">Hola. Soy Fever, tu asistente de sueños.<br><br>Para comenzar, <strong>¿cómo te llamás?</strong></div></div>';
+    msgsEl.appendChild(initDiv);
+    inputEl.disabled = false;
+    sendBtn.disabled = false;
+    inputEl.placeholder = 'Escribí acá...';
+  });
+
+  /* ══════════════════════════════════
+     MERCADO ONÍRICO — TOGGLE VIEW
+  ══════════════════════════════════ */
+  var marketMode = false;
+  var SEED_DREAMS = [
+    { name:'Usuario', dream:'Soñé varias veces que podía volar. Esta vez supe que estaba soñando y aprendí a controlar el vuelo. Para despegar tenía que dar dos saltos seguidos sin tocar el piso.', themes:['lucidez','surrealismo'], lucidez:88 },
+    { name:'Usuario', dream:'Un gato esfinge me miraba mientras yo me desangraba. Se paró en dos patas, prendió un cigarro y con acento francés me dijo: "así es la vida, a veces corta". Después se fue.', themes:['surrealismo','pesadilla'], lucidez:55 },
+    { name:'Usuario', dream:'Corría porque una ola de fuego lo consumía todo. Mi salvación era llegar al mar, pero entre el mar y yo había una línea interminable de casas que cercaban la playa.', themes:['catastrofe','pesadilla'], lucidez:48 },
+    { name:'Usuario', dream:'Soñé que el mar subía lentamente y yo estaba en la terraza de un edificio viendo cómo todo desaparecía bajo el agua. No sentía miedo, solo una calma extraña.', themes:['catastrofe','emotivo'], lucidez:70 }
+  ];
+  var marketPrices = {}; // keyed by name
+
+  function seedPrice(lucidez) {
+    return 120 + Math.round(lucidez * 2.3 + Math.random() * 80);
+  }
+
+  function getMarketEntries() {
+    var all = [];
+    state.users.forEach(function(u){
+      all.push({ name:u.name, dream:u.dream, themes:u.themes, lucidez:u.lucidez || (u.emotion && u.emotion.lucidez) || 50, seeded:false });
+    });
+    // Assign/update prices
+    all.forEach(function(e){
+      var key = e.name + '_' + e.dream.slice(0,20);
+      if (!marketPrices[key]) marketPrices[key] = { price: seedPrice(e.lucidez), history: genHistory(e.lucidez) };
+      e._key = key;
+    });
+    // Sort by price desc
+    all.sort(function(a,b){ return (marketPrices[b._key]||{price:0}).price - (marketPrices[a._key]||{price:0}).price; });
+    return all;
+  }
+
+  function genHistory(lucidez) {
+    // 24 points, roughly trending based on lucidez
+    var pts = [];
+    var v = 0;
+    for (var i=0;i<24;i++) {
+      v += (Math.random()-.45) * 12 + (lucidez > 70 ? .8 : -.3);
+      pts.push(Math.max(-20, Math.min(20, v)));
+    }
+    return pts;
+  }
+
+  function sparklinePath(pts) {
+    var w=90, h=24;
+    var min=Math.min.apply(null,pts), max=Math.max.apply(null,pts);
+    var range = max-min || 1;
+    return pts.map(function(v,i){
+      var x = (i/(pts.length-1))*w;
+      var y = h - ((v-min)/range)*h;
+      return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+  }
+
+  function renderMarket() {
+    var entries = getMarketEntries();
+    var rowsEl = document.getElementById('market-rows');
+    var linesEl = document.getElementById('chart-lines');
+    var legendEl = document.getElementById('chart-legend');
+    if (!rowsEl) return;
+
+    // Tier colors
+    var tierColors = ['#a78bfa','#60a5fa','#34d399','#fbbf24','#f87171','#f472b6','#818cf8','#94a3b8'];
+
+    rowsEl.innerHTML = '';
+
+    if (entries.length === 0) {
+      rowsEl.innerHTML = '<div style="padding:32px 16px;text-align:center;color:rgba(255,255,255,.25);font-size:11px;line-height:1.7;">El mercado está vacío.<br>Contá tu sueño en la constelación<br>para que aparezca acá.</div>';
+      if (linesEl) linesEl.innerHTML = '';
+      if (legendEl) legendEl.innerHTML = '';
+      return;
+    }
+
+    entries.forEach(function(e, i){
+      var mp = marketPrices[e._key || e.name];
+      var varPct = (((mp.price - seedPrice(e.lucidez)) / seedPrice(e.lucidez)) * 100);
+      varPct = Math.max(-15, Math.min(25, varPct + (Math.random()*4-2)));
+      var varStr = (varPct>=0?'+':'')+varPct.toFixed(2)+'%';
+      var varColor = varPct>=0 ? '#22c55e' : '#f87171';
+      var themeLabels = e.themes.map(function(t){ return CLUSTERS[t]?CLUSTERS[t].label:t; }).join(', ');
+      var spPath = sparklinePath(mp.history);
+      var spColor = tierColors[i % tierColors.length];
+      var rankSymbol = i===0?'◆':i===1?'▲':i===2?'●':'·';
+
+      var row = document.createElement('div');
+      row.style.cssText='display:grid;grid-template-columns:36px 1fr 90px 70px 110px;gap:0;align-items:center;padding:14px 6px;border-bottom:1px solid rgba(138,56,245,.08);border-left:2px solid transparent;transition:background .2s,border-color .15s;cursor:pointer;';
+      row.onmouseenter=function(){ if(!this.dataset.selected){ this.style.background='rgba(138,56,245,.07)'; this.style.borderLeftColor=spColor; } };
+      row.onmouseleave=function(){ if(!this.dataset.selected){ this.style.background='transparent'; this.style.borderLeftColor='transparent'; } };
+      (function(entry, color, vStr, vClr, rank){
+        row.addEventListener('click', function(){
+          rowsEl.querySelectorAll('div[data-selected]').forEach(function(r){
+            delete r.dataset.selected;
+            r.style.background='transparent';
+            r.style.borderLeftColor='transparent';
+          });
+          this.dataset.selected='1';
+          this.style.background='rgba(138,56,245,.13)';
+          this.style.borderLeftColor=color;
+          renderMarketDreamPanel(entry, color, vStr, vClr, rank);
+        });
+      })(e, spColor, varStr, varColor, i+1);
+      row.innerHTML =
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<span style="color:'+spColor+';font-size:13px;">'+rankSymbol+'</span>' +
+          '<span style="font-size:11px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.35);">#'+(i+1)+'</span>' +
+        '</div>' +
+        '<div>' +
+          '<h1 style="font-family:\'Space Grotesk\',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:-.01em;">'+e.name+'</h1>' +
+          '<h2 style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400;margin-top:2px;font-family:\'Inter\',sans-serif;">'+e.dream+'</h2>' +
+          '<div style="margin-top:4px;font-size:9px;color:'+spColor+';font-weight:600;letter-spacing:.06em;text-transform:uppercase;">'+themeLabels+'</div>' +
+        '</div>' +
+        '<div style="text-align:right;">' +
+          '<h3 style="font-family:\'JetBrains Mono\',monospace;font-size:13px;font-weight:600;color:#fff;">$'+mp.price.toLocaleString()+'</h3>' +
+          '<div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">USD</div>' +
+        '</div>' +
+        '<div style="text-align:right;font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+varColor+';">'+varStr+'</div>' +
+        '<div style="text-align:right;padding-right:4px;">' +
+          '<svg width="90" height="24" viewBox="0 0 90 24">' +
+            '<path d="'+spPath+'" fill="none" stroke="'+spColor+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>' +
+          '</svg>' +
+        '</div>';
+      rowsEl.appendChild(row);
+    });
+
+    // Comparative chart
+    linesEl.innerHTML = '';
+    legendEl.innerHTML = '';
+    entries.slice(0,5).forEach(function(e,i){
+      var pts = marketPrices[e._key || e.name].history;
+      var col = tierColors[i];
+      var w=860, h=140;
+      var min=-20, max=20, range=40;
+      var d = pts.map(function(v,j){
+        var x=50+(j/(pts.length-1))*760;
+        var y=h-((v-min)/range)*h;
+        return (j===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
+      }).join(' ');
+      var line = document.createElementNS('http://www.w3.org/2000/svg','path');
+      line.setAttribute('d',d);
+      line.setAttribute('fill','none');
+      line.setAttribute('stroke',col);
+      line.setAttribute('stroke-width','1.5');
+      line.setAttribute('stroke-linecap','round');
+      line.setAttribute('stroke-linejoin','round');
+      line.setAttribute('opacity','.75');
+      linesEl.appendChild(line);
+
+      var leg = document.createElement('div');
+      leg.style.cssText='display:flex;align-items:center;gap:5px;';
+      leg.innerHTML='<span style="width:20px;height:2px;background:'+col+';border-radius:2px;display:inline-block;"></span><span style="font-size:9px;font-weight:600;color:rgba(255,255,255,.5);font-family:\'Inter\',sans-serif;">'+e.name+'</span>';
+      legendEl.appendChild(leg);
+    });
+
+    // Update right panel for market mode
+    if (marketMode) renderMarketPanel(entries);
+  }
+
+  function renderMarketDreamPanel(e, color, varStr, varColor, rank) {
+    var panel = document.getElementById('analysis-content');
+    if (!panel) return;
+    var mp = marketPrices[e._key || e.name] || { price: 0, history: [] };
+    var themeLabels = e.themes.map(function(t){ return CLUSTERS[t]?CLUSTERS[t].label:t; });
+    var neural = e.lucidez > 65 ? 'Alta' : e.lucidez > 45 ? 'Media' : 'Baja';
+    var neuralColor = e.lucidez > 65 ? '#22c55e' : e.lucidez > 45 ? '#fbbf24' : '#f87171';
+
+    // Mini sparkline path for panel chart
+    var pts = mp.history;
+    var spWidth=200, spHeight=50;
+    var min=Math.min.apply(null,pts||[0]), max=Math.max.apply(null,pts||[1]);
+    var range=max-min||1;
+    var spPath = (pts||[]).map(function(v,i){
+      var x=(i/(pts.length-1))*spWidth;
+      var y=spHeight-((v-min)/range)*spHeight;
+      return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+
+    panel.innerHTML = [
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">',
+        '<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);">Activo seleccionado</div>',
+        '<div style="font-size:9px;font-weight:700;color:'+color+';letter-spacing:.06em;">#'+rank+'</div>',
+      '</div>',
+
+      '<div style="margin-bottom:16px;">',
+        '<h1 style="font-family:\'Space Grotesk\',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.2;">'+e.name+'</h1>',
+        '<h2 style="font-size:12px;color:rgba(255,255,255,.5);font-weight:400;margin-top:4px;font-style:italic;">'+e.dream+'</h2>',
+        '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">'+
+          themeLabels.map(function(t){ return '<span style="padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(138,56,245,.15);border:1px solid rgba(138,56,245,.3);color:'+color+';">'+t+'</span>'; }).join('')+
+        '</div>',
+      '</div>',
+
+      '<div style="background:rgba(138,56,245,.08);border:1px solid rgba(138,56,245,.12);border-radius:10px;padding:12px;margin-bottom:10px;">',
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;">',
+          '<h3 style="font-family:\'JetBrains Mono\',monospace;font-size:20px;font-weight:700;color:#fff;">$'+mp.price.toLocaleString()+'</h3>',
+          '<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+varColor+';">'+varStr+'</span>',
+        '</div>',
+        '<div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:2px;">Valor actual · USD</div>',
+        pts.length>1?'<svg width="100%" height="50" viewBox="0 0 200 50" preserveAspectRatio="none" style="margin-top:10px;display:block;"><path d="'+spPath+'" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/></svg>':'',
+      '</div>',
+
+      '<div style="background:rgba(138,56,245,.08);border:1px solid rgba(138,56,245,.12);border-radius:10px;padding:12px;margin-bottom:10px;">',
+        '<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Índice de lucidez</div>',
+        '<div style="font-size:20px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:'+color+';">'+e.lucidez+'%</div>',
+        '<div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:8px;overflow:hidden;">',
+          '<div style="height:100%;width:'+e.lucidez+'%;background:linear-gradient(90deg,'+color+',#c4b5fd);border-radius:2px;transition:width .6s ease;"></div>',
+        '</div>',
+      '</div>',
+
+      '<div style="background:rgba(138,56,245,.08);border:1px solid rgba(138,56,245,.12);border-radius:10px;padding:12px;">',
+        '<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Actividad neuronal</div>',
+        '<div style="font-size:13px;font-weight:700;color:'+neuralColor+';">'+neural+'</div>',
+        '<div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:4px;">'+(e.seeded?'Soñador registrado':'Sueño en vivo')+'</div>',
+      '</div>',
+    ].join('');
+  }
+
+  function renderMarketPanel(entries) {
+    var panel = document.getElementById('analysis-content');
+    if (!panel) return;
+    var top = entries[0];
+    var totalVal = entries.reduce(function(s,e){ return s+(marketPrices[e._key || e.name]||{price:0}).price; },0);
+    var avgLucidez = Math.round(entries.reduce(function(s,e){ return s+e.lucidez; },0)/entries.length);
+    var topColor = '#a78bfa';
+    panel.innerHTML = [
+      '<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:16px;">Estado del mercado</div>',
+
+      '<div style="margin-bottom:18px;">',
+        '<div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:6px;">Activo líder</div>',
+        '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:14px;font-weight:700;color:#fff;">'+top.name+'</div>',
+        '<div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:2px;">'+top.dream+'</div>',
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:18px;font-weight:700;color:#a78bfa;margin-top:8px;">$'+(marketPrices[top.name]||{price:0}).price.toLocaleString()+'</div>',
+      '</div>',
+
+      '<div style="background:rgba(138,56,245,.08);border:1px solid rgba(138,56,245,.12);border-radius:10px;padding:12px;margin-bottom:12px;">',
+        '<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Índice de lucidez</div>',
+        '<div style="font-size:22px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#a78bfa;">'+avgLucidez+'%</div>',
+        '<div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:8px;overflow:hidden;">',
+          '<div style="height:100%;width:'+avgLucidez+'%;background:linear-gradient(90deg,#8A38F5,#a78bfa);border-radius:2px;"></div>',
+        '</div>',
+      '</div>',
+
+      '<div style="background:rgba(138,56,245,.08);border:1px solid rgba(138,56,245,.12);border-radius:10px;padding:12px;margin-bottom:12px;">',
+        '<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Capitalización total</div>',
+        '<div style="font-size:16px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#fff;">$'+totalVal.toLocaleString()+' <span style="font-size:10px;color:rgba(255,255,255,.5);">USD</span></div>',
+      '</div>',
+
+      '<div style="background:rgba(138,56,245,.08);border:1px solid rgba(138,56,245,.12);border-radius:10px;padding:12px;">',
+        '<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Mercado onírico</div>',
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">',
+          '<span style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;display:inline-block;"></span>',
+          '<span style="font-size:11px;font-weight:700;color:#22c55e;">Abierto</span>',
+        '</div>',
+        '<div style="font-size:10px;color:rgba(255,255,255,.4);">Volatilidad: <span style="color:#fbbf24;font-weight:600;">Moderada</span></div>',
+        '<div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;">'+entries.length+' activos · '+(entries.filter(function(e){return !e.seeded;}).length)+' en vivo</div>',
+      '</div>'
+    ].join('');
+  }
+
+  // Wire up toggle button
+  var btnToggle = document.getElementById('btn-toggle-view');
+  var toggleLabel = document.getElementById('toggle-label');
+  var toggleIcon = document.getElementById('toggle-icon');
+  var marketView = document.getElementById('market-view');
+  var svgMap = document.querySelector('.constellation svg');
+  var mapRoot = document.getElementById('map-root');
+  var mapControls = document.querySelector('.map-controls');
+  var resetBtn = document.getElementById('btn-reset-map');
+
+  if (btnToggle) {
+    btnToggle.addEventListener('click', function(){
+      marketMode = !marketMode;
+      if (marketMode) {
+        // Show market, hide constellation SVG
+        marketView.style.display = 'block';
+        toggleLabel.textContent = 'Ver constelación';
+        toggleIcon.innerHTML = '<circle cx="12" cy="12" r="2"/><circle cx="6" cy="5" r="2"/><circle cx="18" cy="5" r="2"/><circle cx="18" cy="19" r="2"/><circle cx="6" cy="19" r="2"/><line x1="12" y1="10" x2="8" y2="7" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="10" x2="16" y2="7" stroke="currentColor" stroke-width="1.5"/>';
+        renderMarket();
+      } else {
+        // Show constellation
+        marketView.style.display = 'none';
+        toggleLabel.textContent = 'Ver mercado';
+        toggleIcon.innerHTML = '<rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="8" width="7" height="13" rx="1"/>';
+        // Restore own analysis panel
+        if (state.step >= 3 && state.userName) {
+          var me = state.users.find(function(u){ return u.name===state.userName; });
+          if (me) showUserPanel(me);
+        }
+        renderConstellation();
+      }
+    });
+  }
+
+  // Patch renderConstellation & submission to also refresh market if in market mode
+  var _origRenderConstellation = renderConstellation;
+  // After each new user added: market auto-refreshes
+  // (we hook into the addMessage wrapper is complex, so we just call renderMarket after renderConstellation if marketMode)
+  var _patchedRenderConstellation = renderConstellation;
+
+  // Price ticker — update prices every 3s
+  setInterval(function(){
+    Object.keys(marketPrices).forEach(function(k){
+      var mp = marketPrices[k];
+      mp.price = Math.max(110, mp.price + Math.round((Math.random()-.45)*18));
+      // Shift history
+      var last = mp.history[mp.history.length-1];
+      var next = last + (Math.random()-.45)*4;
+      mp.history.push(Math.max(-20,Math.min(20,next)));
+      if (mp.history.length>24) mp.history.shift();
+    });
+    if (marketMode) renderMarket();
+  }, 3000);
+
+  /* ══════════════════════════════════
+     INIT
+  ══════════════════════════════════ */
+  renderConstellation();
+  renderMarket(); // seed initial prices
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){ document.documentElement.classList.add('ready'); }, 30);
+  });
+  setTimeout(function(){ document.documentElement.classList.add('ready'); }, 30);
+
+  /* ══════════════════════════════════
+     PANEL ADMIN — BANCO DE SUEÑOS
+     Acceder con: hypn-ia.html?admin
+  ══════════════════════════════════ */
+  if(new URLSearchParams(window.location.search).has('admin')){
+    var adminBtn = document.createElement('button');
+    adminBtn.textContent = '📋 Banco de sueños';
+    adminBtn.style.cssText = 'position:fixed;bottom:24px;left:24px;z-index:9999;background:#1a0d3a;border:1px solid rgba(138,56,245,.4);color:#c4b5fd;font-family:var(--f-body);font-size:12px;padding:9px 16px;border-radius:20px;cursor:pointer;';
+    document.body.appendChild(adminBtn);
+
+    var adminOverlay = document.createElement('div');
+    adminOverlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:10000;background:rgba(6,4,15,.92);backdrop-filter:blur(8px);overflow-y:auto;padding:40px 24px;';
+    adminOverlay.innerHTML =
+      '<div style="max-width:700px;margin:0 auto;">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">'+
+          '<div style="font-family:var(--f-head);font-size:22px;font-weight:700;color:#fff;">Banco de sueños registrados</div>'+
+          '<button id="admin-close" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;">Cerrar</button>'+
+        '</div>'+
+        '<div id="admin-list" style="display:flex;flex-direction:column;gap:12px;"></div>'+
+        '<button id="admin-copy" style="margin-top:24px;width:100%;padding:12px;background:rgba(138,56,245,.2);border:1px solid rgba(138,56,245,.4);color:#c4b5fd;border-radius:10px;cursor:pointer;font-size:13px;font-family:var(--f-body);">Copiar todos para Google Doc</button>'+
+      '</div>';
+    document.body.appendChild(adminOverlay);
+
+    function renderAdmin(){
+      var stored = [];
+      try{ stored = JSON.parse(localStorage.getItem('hypn_users')||'[]'); }catch(e){}
+      var list = document.getElementById('admin-list');
+      if(!stored.length){
+        list.innerHTML = '<p style="color:rgba(255,255,255,.4);font-size:13px;">Todavía no hay sueños registrados.</p>';
+        return;
+      }
+      list.innerHTML = stored.map(function(u,i){
+        return '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(138,56,245,.15);border-radius:12px;padding:16px;">'+
+          '<div style="font-size:10px;color:#a78bfa;font-weight:700;letter-spacing:.1em;margin-bottom:6px;">'+(i+1)+'. '+u.name+'</div>'+
+          '<div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.6;">'+u.dream+'</div>'+
+        '</div>';
+      }).join('');
+    }
+
+    adminBtn.addEventListener('click', function(){
+      renderAdmin();
+      adminOverlay.style.display = 'block';
+    });
+    document.getElementById('admin-close').addEventListener('click', function(){
+      adminOverlay.style.display = 'none';
+    });
+    document.getElementById('admin-copy').addEventListener('click', function(){
+      var stored = [];
+      try{ stored = JSON.parse(localStorage.getItem('hypn_users')||'[]'); }catch(e){}
+      var text = stored.map(function(u,i){ return (i+1)+'. '+u.name+'\n'+u.dream; }).join('\n\n');
+      navigator.clipboard.writeText(text).then(function(){
+        document.getElementById('admin-copy').textContent = '✓ Copiado al portapapeles';
+        setTimeout(function(){ document.getElementById('admin-copy').textContent = 'Copiar todos para Google Doc'; }, 2500);
+      });
+    });
+  }
+
+  /* ══════════════════════════════════
+     CLUSTER → PANEL DERECHO
+  ══════════════════════════════════ */
+  var CLUSTER_INFO = {
+    lucidez:     { icon:'◎', desc:'El soñador sabe que está soñando. Puede controlar el entorno, desafiar la física o simplemente observar con plena conciencia. El estado más raro y buscado.' },
+    paralisis:   { icon:'◈', desc:'El cuerpo no responde. Intentás moverte o gritar pero nada sale. A menudo viene acompañado de una presencia oscura en la habitación. Entre el sueño y la vigilia.' },
+    catastrofe:  { icon:'◉', desc:'Tsunamis, guerras, incendios, fin del mundo. El peligro es masivo y externo. Estos sueños reflejan ansiedades colectivas y sensación de pérdida de control sobre lo que nos rodea.' },
+    pesadilla:   { icon:'◆', desc:'Persecución, miedo intenso, criaturas que amenazan. El soñador huye o enfrenta algo que lo aterra. La adrenalina es real aunque el peligro no lo sea.' },
+    surrealismo: { icon:'◇', desc:'La lógica se rompe. Animales que hablan, lugares imposibles, objetos que se transforman. El subconsciente ignora las reglas de la física y crea mundos que no podrían existir.' },
+    emotivo:     { icon:'◐', desc:'Reencuentros con personas fallecidas, despedidas que duelen, nostalgia pura. El sueño carga con una emoción tan intensa que al despertar el corazón sigue sintiendo.' }
+  };
+
+  var EXP_SUGGEST = {
+    lucidez:     { exp:'Profundización', tag:'04', color:'#a78bfa', desc:'Tus sueños lúcidos son señal de una mente consciente dentro del sueño. Fever puede llevar esa conciencia más lejos: guiarte por escenarios de exploración diseñados para que aproveches ese estado raro. Usalo para expandir, no para forzar.', aviso:'Evitá depender de la lucidez para "escapar" de emociones difíciles. Lo que el sueño lúcido muestra también merece atención despierto.' },
+    paralisis:   { exp:'Bienestar',      tag:'03', color:'#34d399', desc:'La parálisis del sueño activa el sistema nervioso de forma intensa. Fever Bienestar trabaja exactamente eso: reducir la actividad simpática antes de dormir para que tu cuerpo entre en un estado de mayor seguridad.', aviso:'Si la parálisis es frecuente, consultá con un profesional. Fever es un complemento, no un tratamiento.' },
+    catastrofe:  { exp:'Bienestar',      tag:'03', color:'#34d399', desc:'Los sueños de catástrofe procesan miedos colectivos y sensación de pérdida de control. La experiencia Bienestar puede ayudarte a regular esas emociones antes de dormir, creando un entorno más seguro para tu subconsciente.', aviso:'Si estos sueños generan angustia persistente durante el día, hablar con alguien puede ser más útil que cualquier tecnología.' },
+    pesadilla:   { exp:'Bienestar',      tag:'03', color:'#34d399', desc:'Las pesadillas son procesamiento emocional intenso. Fever Bienestar no las elimina — las acompaña. Estímulos de 40 Hz durante REM pueden reducir la carga del sistema nervioso y suavizar la intensidad del sueño.', aviso:'No uses Fever para suprimir pesadillas que podrían estar señalando algo importante. La tecnología bien usada acompaña, no tapa.' },
+    surrealismo: { exp:'Creatividad',    tag:'01', color:'#e879f9', desc:'Una mente que genera mundos absurdos e imposibles tiene una capacidad creativa excepcional. Fever Creatividad activa las zonas de ideación durante REM y potencia exactamente eso: conexiones que la mente consciente no haría sola.', aviso:'La creatividad en sueños surge sin presión. No uses Fever como herramienta de producción: usala para explorar, no para entregar.' },
+    emotivo:     { exp:'Aprendizaje',    tag:'02', color:'#60a5fa', desc:'Los sueños con alta carga emocional consolidan memorias profundas. La experiencia Aprendizaje refuerza circuitos de memoria durante esa misma fase, haciendo que lo que sentiste también quede grabado como comprensión.', aviso:'Procesar duelo o nostalgia lleva tiempo. No reemplaces ese proceso con estimulación. Fever puede acompañar, nunca apurar.' }
+  };
+
+  function focusCluster(key) {
+    var cl = CLUSTERS[key];
+    if(!cl) return;
+
+    // Dim / highlight user nodes
+    document.querySelectorAll('.user-node').forEach(function(n){
+      var themes = (n.getAttribute('data-themes')||'').split(',');
+      var match = themes.indexOf(key) !== -1;
+      n.style.opacity = match ? '1' : '0.08';
+      n.style.transition = 'opacity .35s';
+    });
+
+    // Dim / highlight connection lines
+    document.querySelectorAll('#lines-layer line').forEach(function(l){
+      var isMatch = l.getAttribute('data-cluster') === key;
+      l.setAttribute('stroke-opacity', isMatch ? '0.7' : '0.04');
+      l.setAttribute('stroke-width', isMatch ? '1.5' : '1');
+    });
+
+    // Dim other cluster nodes, highlight this one
+    document.querySelectorAll('.cluster-node').forEach(function(n){
+      var isThis = n.getAttribute('data-cluster') === key;
+      n.style.opacity = isThis ? '1' : '0.2';
+      n.style.transition = 'opacity .35s';
+    });
+  }
+
+  function resetFocus() {
+    document.querySelectorAll('.user-node').forEach(function(n){ n.style.opacity='1'; });
+    document.querySelectorAll('#lines-layer line').forEach(function(l){
+      l.setAttribute('stroke-opacity','0.25'); l.setAttribute('stroke-width','1');
+    });
+    document.querySelectorAll('.cluster-node').forEach(function(n){ n.style.opacity='1'; });
+  }
+
+  document.querySelectorAll('.cluster-node').forEach(function(node){
+    node.addEventListener('click', function(e){
+      e.stopPropagation();
+      var key = node.getAttribute('data-cluster');
+      var cl = CLUSTERS[key];
+      var info = CLUSTER_INFO[key];
+      var sug = EXP_SUGGEST[key];
+      if(!cl || !info) return;
+
+      focusCluster(key);
+
+      var count = state.clusterCounts[key] || 0;
+      document.getElementById('analysis-content').innerHTML =
+        // Header
+        '<div style="margin-top:14px;display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid rgba(138,56,245,.15);">'+
+          '<div style="width:40px;height:40px;border-radius:50%;background:'+cl.color+'22;border:1px solid '+cl.color+'66;display:flex;align-items:center;justify-content:center;font-size:18px;color:'+cl.color+';flex-shrink:0;">'+info.icon+'</div>'+
+          '<div>'+
+            '<div style="font-family:var(--f-head);font-size:17px;font-weight:700;color:'+cl.color+';">'+cl.label+'</div>'+
+            '<div style="font-size:10px;color:var(--t40);margin-top:2px;">'+count+' soñadores en esta constelación</div>'+
+          '</div>'+
+        '</div>'+
+        // Descripción
+        '<div style="margin-top:14px;font-size:12px;color:var(--t60);line-height:1.7;">'+info.desc+'</div>'+
+        // Sugerencia de experiencia
+        (sug ?
+        '<div style="margin-top:18px;background:'+sug.color+'11;border:1px solid '+sug.color+'33;border-radius:12px;padding:14px;">'+
+          '<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+sug.color+';margin-bottom:6px;">'+sug.tag+' — Experiencia sugerida</div>'+
+          '<div style="font-family:var(--f-head);font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;">'+sug.exp+'</div>'+
+          '<div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.65;margin-bottom:10px;">'+sug.desc+'</div>'+
+          '<div style="font-size:10px;color:rgba(255,255,255,.35);line-height:1.5;border-top:1px solid rgba(255,255,255,.07);padding-top:8px;">⚠ '+sug.aviso+'</div>'+
+        '</div>' : '')+
+        (sug ?
+        '<a href="suscripciones.html" style="display:block;margin-top:10px;width:100%;padding:11px;background:linear-gradient(135deg,'+sug.color+','+cl.color+');border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;font-family:var(--f-body);text-align:center;text-decoration:none;cursor:pointer;letter-spacing:.02em;">Activar experiencia '+sug.exp+' →</a>' : '')+
+        '<button id="btn-reset-focus" style="margin-top:10px;width:100%;padding:8px;background:transparent;border:1px solid rgba(138,56,245,.25);border-radius:8px;color:rgba(138,56,245,.6);font-size:11px;cursor:pointer;font-family:var(--f-body);">← Ver toda la constelación</button>';
+
+      document.getElementById('btn-reset-focus').addEventListener('click', function(){
+        resetFocus();
+        document.getElementById('analysis-content').innerHTML='<div style="margin-top:20px;" class="analysis__placeholder">Contale tu sueño a Fever para ver tu análisis onírico en tiempo real.</div>';
+      });
+    });
+  });
+
+
+  // CONECTAR SONADORES (hasta 3)
+  var selUsers = [];
+
+  function addSelRing(g, color) {
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var existing = g.querySelector('.sel-ring');
+    if (existing) existing.remove();
+    var cx = g.querySelectorAll('circle')[1].getAttribute('cx');
+    var cy = g.querySelectorAll('circle')[1].getAttribute('cy');
+    var r = document.createElementNS(svgNS, 'circle');
+    r.setAttribute('cx', cx); r.setAttribute('cy', cy); r.setAttribute('r', '13');
+    r.setAttribute('fill', 'none'); r.setAttribute('stroke', color);
+    r.setAttribute('stroke-width', '1.8'); r.setAttribute('stroke-dasharray', '3 3');
+    r.setAttribute('opacity', '.85'); r.setAttribute('class', 'sel-ring');
+    g.appendChild(r);
+  }
+
+  function clearSelRings() {
+    document.querySelectorAll('.sel-ring').forEach(function(r) { r.remove(); });
+    selUsers = [];
+    document.querySelectorAll('.user-node').forEach(function(n) { n.style.opacity = '1'; });
+    var h = document.getElementById('conn-result');
+    if (h) h.remove();
+  }
+
+  var ringColors = ['#c4b5fd', '#f472b6', '#60a5fa'];
+
+  // Common words between dream texts (Spanish stopwords filtered)
+  var STOP = {'y':1,'que':1,'de':1,'en':1,'el':1,'la':1,'los':1,'las':1,'un':1,'una':1,'unos':1,'unas':1,'a':1,'al':1,'con':1,'por':1,'para':1,'pero':1,'me':1,'mi':1,'se':1,'le':1,'lo':1,'su':1,'era':1,'fue':1,'no':1,'si':1,'yo':1,'muy':1,'mas':1,'ya':1,'es':1,'o':1,'como':1,'eso':1,'esto':1,'del':1,'que':1,'hay':1,'habia':1,'iba':1,'nos':1,'cuando':1,'estaba':1,'estaban':1,'me':1,'te':1,'le':1,'tambien':1,'todo':1,'toda':1,'todos':1,'este':1,'esta':1,'ahi':1,'alli':1,'ahora':1,'luego':1,'despues':1,'antes':1,'hasta':1,'desde':1,'entre':1,'sobre':1,'hacia':1,'porque':1,'aunque':1,'mientras':1,'entonces':1};
+
+  function dreamWords(txt) {
+    return txt.toLowerCase().replace(/[^a-záéíóúñ ]/g,'').split(/\s+/).filter(function(w){ return w.length > 3 && !STOP[w]; });
+  }
+
+  function commonWords(users) {
+    if (users.length < 2) return [];
+    var sets = users.map(function(u){ return dreamWords(u.dream || ''); });
+    var base = sets[0];
+    return base.filter(function(w){
+      return sets.slice(1).every(function(s){ return s.indexOf(w) !== -1; });
+    }).filter(function(w, i, arr){ return arr.indexOf(w) === i; }).slice(0, 5);
+  }
+
+  // Resonance score 0-100
+  function resonanceScore(users) {
+    var allThemes = [];
+    users.forEach(function(u){ (u.themes||[]).forEach(function(t){ if(allThemes.indexOf(t)===-1) allThemes.push(t); }); });
+    var shared = allThemes.filter(function(t){ return users.every(function(u){ return (u.themes||[]).indexOf(t) !== -1; }); });
+    var themeScore = Math.min(40, shared.length * 20);
+    var lucs = users.map(function(u){ return u.lucidez || (u.emotion && u.emotion.lucidez) || 50; });
+    var maxDelta = Math.max.apply(null, lucs) - Math.min.apply(null, lucs);
+    var lucScore = Math.round(Math.max(0, 30 - maxDelta * 0.6));
+    var wordScore = Math.min(20, commonWords(users).length * 7);
+    var base = 10;
+    return Math.min(99, base + themeScore + lucScore + wordScore);
+  }
+
+  // Narrative combinator: given all unique themes across selected users, pick a description
+  var THEME_NARRATIVES = {
+    'lucidez+pesadilla':   'La conciencia plena enfrenta el terror: estos sonadores saben que huyen, pero no pueden despertar a voluntad.',
+    'lucidez+paralisis':   'El estado mas raro del sueno: saben que estan sonando pero el cuerpo no responde. Observadores atrapados.',
+    'lucidez+emotivo':     'La lucidez no protege de la emocion. Estos sonadores experimentan el duelo o la alegria con plena conciencia de que es un sueno, y aun asi les duele.',
+    'lucidez+catastrofe':  'El fin del mundo visto con ojos abiertos. Saben que es un sueno pero el apocalipsis se siente igual de real.',
+    'lucidez+surrealismo': 'El sueno mas libre: la mente consciente jugando con leyes imposibles. El laboratorio del subconsciente.',
+    'pesadilla+paralisis': 'La combinacion mas oscura: el peligro se acerca y el cuerpo no puede moverse. La indefension total.',
+    'pesadilla+emotivo':   'El miedo mezclado con el amor. Perseguidos por algo que les importa perder, no solo por sobrevivir.',
+    'pesadilla+catastrofe':'El mundo se derrumba y ellos estan corriendo. El miedo es doble: al desastre y a no escapar.',
+    'pesadilla+surrealismo':'Las reglas del horror no tienen logica. El monstruo cambia de forma, el camino desaparece, la amenaza es imposible.',
+    'paralisis+emotivo':   'Inmovilizados frente a algo que aman o temen perder. El cuerpo no responde pero el corazon si.',
+    'paralisis+catastrofe':'El desastre ocurre alrededor y no pueden moverse. La impotencia ante lo incontrolable.',
+    'paralisis+surrealismo':'El cuerpo inmovil en un mundo que se transforma solo. Testigos involuntarios de lo imposible.',
+    'emotivo+catastrofe':  'El fin del mundo no es abstracto: es la perdida de alguien. El apocalipsis con cara de persona amada.',
+    'emotivo+surrealismo': 'Las emociones mas intensas en escenarios que no existen. El subconsciente usando lo imposible para decir lo real.',
+    'catastrofe+surrealismo':'El caos que no tiene forma. El desastre no sigue reglas. Mas aterrador porque no se puede predecir.'
+  };
+
+  function getThemeNarrative(users) {
+    var allThemes = [];
+    users.forEach(function(u){ (u.themes||[]).forEach(function(t){ if(allThemes.indexOf(t)===-1) allThemes.push(t); }); });
+    // Try pairs
+    for (var i = 0; i < allThemes.length; i++) {
+      for (var j = i+1; j < allThemes.length; j++) {
+        var key1 = allThemes[i]+'+'+allThemes[j];
+        var key2 = allThemes[j]+'+'+allThemes[i];
+        if (THEME_NARRATIVES[key1]) return THEME_NARRATIVES[key1];
+        if (THEME_NARRATIVES[key2]) return THEME_NARRATIVES[key2];
+      }
+    }
+    // Fallback based on dominant themes
+    var labels = allThemes.map(function(t){ return CLUSTERS[t]?CLUSTERS[t].label:t; });
+    return 'Universos oníricos distintos que se rozan. La tension entre ' + labels.join(' y ') + ' construye un espacio que ninguno sonaria solo.';
+  }
+
+  function getDreamProfile(user) {
+    var themes = user.themes || [];
+    var luc = user.lucidez || (user.emotion && user.emotion.lucidez) || 50;
+    var has = function(t){ return themes.indexOf(t) !== -1; };
+    return {
+      lucidez:   luc,
+      emocion:   has('emotivo') ? 75 + Math.floor(Math.random()*20) : 30 + Math.floor(Math.random()*35),
+      miedo:     (has('pesadilla')||has('paralisis')) ? 65 + Math.floor(Math.random()*30) : 10 + Math.floor(Math.random()*30),
+      libertad:  (has('surrealismo')||has('lucidez')) ? 60 + Math.floor(Math.random()*35) : 15 + Math.floor(Math.random()*40),
+      extraneza: has('surrealismo') ? 70 + Math.floor(Math.random()*25) : has('catastrofe') ? 50+Math.floor(Math.random()*25) : 15 + Math.floor(Math.random()*40)
+    };
+  }
+
+  function radarPolygon(cx, cy, r, vals, axes) {
+    // vals: array of 0-1 values, axes: count
+    var pts = [];
+    for (var i = 0; i < axes; i++) {
+      var angle = (Math.PI * 2 * i / axes) - Math.PI / 2;
+      pts.push([
+        cx + r * vals[i] * Math.cos(angle),
+        cy + r * vals[i] * Math.sin(angle)
+      ]);
+    }
+    return pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+  }
+
+  function buildRadarSVG(profiles, colors, names) {
+    var cx = 110, cy = 105, r = 72;
+    var axes = 5;
+    var labels = ['LUCIDEZ','EMOCIÓN','MIEDO','LIBERTAD','EXTRAÑEZA'];
+    var keys   = ['lucidez','emocion','miedo','libertad','extraneza'];
+    var W = 220, H = 210;
+    var svgId = 'radar-' + Date.now();
+
+    var svg = '<svg id="'+svgId+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:220px;display:block;margin:0 auto;overflow:visible;">';
+
+    // Defs: tooltip style via foreignObject not needed — use rect+text group
+    // Grid rings
+    [0.25,0.5,0.75,1].forEach(function(f){
+      var pts = [];
+      for(var i=0;i<axes;i++){
+        var a=(Math.PI*2*i/axes)-Math.PI/2;
+        pts.push((cx+r*f*Math.cos(a)).toFixed(1)+','+(cy+r*f*Math.sin(a)).toFixed(1));
+      }
+      svg += '<polygon points="'+pts.join(' ')+'" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>';
+    });
+
+    // Axis lines
+    for(var i=0;i<axes;i++){
+      var a=(Math.PI*2*i/axes)-Math.PI/2;
+      var x2=(cx+r*Math.cos(a)).toFixed(1), y2=(cy+r*Math.sin(a)).toFixed(1);
+      svg += '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2+'" y2="'+y2+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+    }
+
+    // Axis endpoint dots (interactive — show tooltip on hover)
+    for(var i=0;i<axes;i++){
+      var a=(Math.PI*2*i/axes)-Math.PI/2;
+      var ex=(cx+r*Math.cos(a)).toFixed(1);
+      var ey=(cy+r*Math.sin(a)).toFixed(1);
+      // Invisible larger hit area + visible dot + title tooltip
+      svg += '<g class="radar-axis-tip" style="cursor:default;">' +
+        '<circle cx="'+ex+'" cy="'+ey+'" r="10" fill="transparent"/>' +
+        '<circle cx="'+ex+'" cy="'+ey+'" r="2.5" fill="rgba(255,255,255,0.18)"/>' +
+        '<title>'+labels[i]+'</title>' +
+        '</g>';
+    }
+
+    // Labels — abbrev always visible, full on hover via title
+    var abbrevs = ['LUC','EMO','MIEDO','LIB','EXT'];
+    for(var i=0;i<axes;i++){
+      var a=(Math.PI*2*i/axes)-Math.PI/2;
+      var lx=(cx+(r+18)*Math.cos(a)).toFixed(1);
+      var ly=(cy+(r+18)*Math.sin(a)).toFixed(1);
+      var anchor = Math.cos(a) > 0.25 ? 'start' : Math.cos(a) < -0.25 ? 'end' : 'middle';
+      svg += '<text x="'+lx+'" y="'+ly+'" text-anchor="'+anchor+'" dominant-baseline="middle" ' +
+        'font-size="7.5" font-family="Inter,sans-serif" font-weight="700" letter-spacing="0.06em" ' +
+        'fill="rgba(255,255,255,0.45)" style="cursor:pointer;" ' +
+        'data-fulllabel="'+labels[i]+'">' +
+        abbrevs[i] +
+        '</text>';
+    }
+
+    // User polygons (back to front)
+    profiles.forEach(function(prof, idx){
+      var vals = keys.map(function(k){ return prof[k]/100; });
+      var pts = radarPolygon(cx, cy, r, vals, axes);
+      var col = colors[idx];
+      svg += '<polygon points="'+pts+'" fill="'+col+'" fill-opacity="0.15" stroke="'+col+'" stroke-width="1.5" stroke-opacity="0.8"/>';
+      // Vertex dots with value tooltip
+      for(var i=0;i<axes;i++){
+        var a=(Math.PI*2*i/axes)-Math.PI/2;
+        var vx=(cx+r*vals[i]*Math.cos(a)).toFixed(1);
+        var vy=(cy+r*vals[i]*Math.sin(a)).toFixed(1);
+        var val = Math.round(prof[keys[i]]);
+        svg += '<g style="cursor:default;">' +
+          '<circle cx="'+vx+'" cy="'+vy+'" r="8" fill="transparent"/>' +
+          '<circle cx="'+vx+'" cy="'+vy+'" r="3" fill="'+col+'" opacity="0.95"/>' +
+          '<title>'+labels[i]+': '+val+'%'+(names[idx] ? ' ('+names[idx]+')' : '')+'</title>' +
+          '</g>';
+      }
+    });
+
+    // Center dot
+    svg += '<circle cx="'+cx+'" cy="'+cy+'" r="3" fill="rgba(255,255,255,0.12)"/>';
+
+    svg += '</svg>';
+    return svg;
+  }
+
+  // ── VALOR ONÍRICO ─────────────────────────────────────────────
+  function calcValorOnirico(user) {
+    var key = 'hypn_valor_' + (user.name || '').toLowerCase().replace(/\s+/g,'_');
+    var stored = localStorage.getItem(key);
+    if (stored) return parseInt(stored);
+    // Deterministic hash from name + dream text + themes
+    var seed = (user.name || '') + (user.dream || '') + (user.themes || []).join('');
+    var hash = 0;
+    for (var i = 0; i < seed.length; i++) {
+      hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+      hash |= 0;
+    }
+    // Map to range 800–9999 HYP
+    var val = 800 + Math.abs(hash % 9200);
+    localStorage.setItem(key, val);
+    return val;
+  }
+
+  function showValorOnirico(user) {
+    var val = calcValorOnirico(user);
+    var formatted = val.toLocaleString('es-AR');
+    var existing = document.getElementById('valor-modal');
+    if (existing) { existing.remove(); return; }
+
+    var modal = document.createElement('div');
+    modal.id = 'valor-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+    modal.innerHTML =
+      '<div style="position:relative;background:#0d0a1e;border:1px solid rgba(138,56,245,.5);border-radius:20px;padding:40px 36px;max-width:300px;width:88%;text-align:center;box-shadow:0 0 60px rgba(138,56,245,.3);">' +
+        '<button id="valor-modal-close" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);font-size:18px;cursor:pointer;line-height:1;padding:0;">✕</button>' +
+        '<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(196,181,253,.5);margin-bottom:16px;">Valor Onírico</div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:10px;">' + user.name + '</div>' +
+        '<div style="font-size:54px;font-weight:800;color:#c4b5fd;letter-spacing:-2px;line-height:1;">' + formatted + '</div>' +
+        '<div style="font-size:14px;color:rgba(196,181,253,.5);margin-top:6px;font-weight:600;letter-spacing:.1em;">HYP</div>' +
+        '<div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(138,56,245,.15);font-size:10px;color:rgba(255,255,255,.22);line-height:1.7;">Este valor es único e irrepetible.<br>No fluctúa con el mercado.</div>' +
+      '</div>';
+
+    document.body.appendChild(modal);
+    document.getElementById('valor-modal-close').addEventListener('click', function(){ modal.remove(); });
+    modal.addEventListener('click', function(e){ if(e.target === modal) modal.remove(); });
+  }
+
+  function renderConnectPanel() {
+    var panel = document.getElementById('analysis-content');
+    if (!panel) return;
+    var old = document.getElementById('conn-result');
+    if (old) old.remove();
+    if (selUsers.length === 0) return;
+
+    var card = document.createElement('div');
+    card.id = 'conn-result';
+    card.style.cssText = 'margin-top:14px;';
+
+    var namesHtml = selUsers.map(function(u, i) {
+      return '<span style="color:' + ringColors[i] + ';font-weight:700;">' + u.name.split(' ')[0] + '</span>';
+    }).join(' <span style="color:rgba(255,255,255,.2);">+</span> ');
+
+    if (selUsers.length === 1) {
+      card.innerHTML =
+        '<div style="padding:12px 14px;background:rgba(196,181,253,.05);border:1px solid rgba(196,181,253,.12);border-radius:10px;">' +
+        '<div style="font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:7px;">Conectar sueños</div>' +
+        '<div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:10px;line-height:1.5;">' + namesHtml + ' seleccionado/a.<br>Tocá hasta 2 soñadores más para comparar perfiles oníricos.</div>' +
+        '<button id="btn-clear-sel" style="background:none;border:none;color:rgba(255,255,255,.2);font-size:9px;cursor:pointer;padding:0;font-family:var(--f-body);">x cancelar</button>' +
+        '</div>';
+    } else {
+      var score = resonanceScore(selUsers);
+      var narrative = getThemeNarrative(selUsers);
+      var profiles = selUsers.map(getDreamProfile);
+      var scoreColor = score > 65 ? '#34d399' : score > 35 ? '#a78bfa' : '#60a5fa';
+      var scoreLabel = score > 65 ? 'Alta afinidad onírica' : score > 35 ? 'Frecuencias cercanas' : 'Universos distintos';
+
+      // Shared themes
+      var allThemeMap = {};
+      selUsers.forEach(function(u, ui){
+        (u.themes||[]).forEach(function(t){
+          if (!allThemeMap[t]) allThemeMap[t] = [];
+          allThemeMap[t].push(ui);
+        });
+      });
+      var sharedThemes = Object.keys(allThemeMap).filter(function(t){ return allThemeMap[t].length >= selUsers.length; });
+      var sharedHtml = sharedThemes.map(function(t){
+        var label = CLUSTERS[t] ? CLUSTERS[t].label : t;
+        return '<span style="padding:2px 8px;border-radius:100px;font-size:9px;font-weight:700;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;">● '+label+'</span>';
+      }).join('');
+
+      // Radar SVG
+      var radarSvg = buildRadarSVG(profiles, selUsers.map(function(_,i){ return ringColors[i]; }), selUsers.map(function(u){ return u.name.split(' ')[0]; }));
+
+      // Legend per user with key stats
+      var legendHtml = selUsers.map(function(u, i){
+        var p = profiles[i];
+        var dominant = ['lucidez','emocion','miedo','libertad','extraneza'].reduce(function(a,b){ return p[a]>p[b]?a:b; });
+        var dominantLabel = {lucidez:'Lucidez',emocion:'Emoción',miedo:'Miedo',libertad:'Libertad',extraneza:'Extrañeza'}[dominant];
+        return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">' +
+          '<div style="width:8px;height:8px;border-radius:50%;background:'+ringColors[i]+';flex-shrink:0;"></div>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<span style="font-size:10px;font-weight:700;color:'+ringColors[i]+';">'+u.name.split(' ')[0]+'</span>' +
+            '<span style="font-size:9px;color:rgba(255,255,255,.3);margin-left:5px;">↑ '+dominantLabel+'</span>' +
+          '</div>' +
+          '<span style="font-size:9px;font-family:monospace;color:rgba(255,255,255,.4);">'+p.lucidez+'% lúcido</span>' +
+        '</div>';
+      }).join('');
+
+      // Resonance ring SVG
+      var ringPct = score/100;
+      var circumference = 2 * Math.PI * 18;
+      var dashOffset = circumference * (1 - ringPct);
+      var ringSvg = '<svg viewBox="0 0 48 48" width="48" height="48" style="transform:rotate(-90deg)">' +
+        '<circle cx="24" cy="24" r="18" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/>' +
+        '<circle cx="24" cy="24" r="18" fill="none" stroke="'+scoreColor+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+circumference.toFixed(1)+'" stroke-dashoffset="'+dashOffset.toFixed(1)+'"/>' +
+        '</svg>';
+
+      card.innerHTML =
+        // Header
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
+          '<div>' +
+            '<div style="font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:4px;">Perfil onírico comparado</div>' +
+            '<div style="font-size:12px;font-weight:700;color:#fff;">' + namesHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+
+        // Radar chart
+        '<div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 10px 10px;margin-bottom:10px;">' +
+          radarSvg +
+          '<div style="margin-top:10px;">' + legendHtml + '</div>' +
+        '</div>' +
+
+        // Resonance score
+        '<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:10px;">' +
+          '<div style="position:relative;flex-shrink:0;">' +
+            ringSvg +
+            '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">' +
+              '<span style="font-family:monospace;font-size:11px;font-weight:700;color:'+scoreColor+';">'+score+'</span>' +
+            '</div>' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:2px;">Índice de resonancia</div>' +
+            '<div style="font-size:9px;color:'+scoreColor+';">'+scoreLabel+'</div>' +
+          '</div>' +
+        '</div>' +
+
+        // Shared themes
+        (sharedHtml ? '<div style="margin-bottom:10px;"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:5px;">Universo compartido</div><div style="display:flex;flex-wrap:wrap;gap:4px;">'+sharedHtml+'</div></div>' : '') +
+
+        // Narrative
+        '<div style="padding:10px 12px;background:rgba(138,56,245,.06);border-left:2px solid rgba(138,56,245,.4);border-radius:0 8px 8px 0;margin-bottom:10px;">' +
+          '<div style="font-size:10px;color:rgba(255,255,255,.5);line-height:1.65;font-style:italic;">"' + narrative + '"</div>' +
+        '</div>' +
+
+        (selUsers.length < 3 ? '<div style="font-size:9px;color:rgba(255,255,255,.18);margin-bottom:8px;">Podés agregar ' + (3 - selUsers.length) + ' soñador más.</div>' : '') +
+        '<button id="btn-clear-sel" style="background:none;border:none;color:rgba(255,255,255,.18);font-size:9px;cursor:pointer;padding:0;font-family:var(--f-body);">x limpiar selección</button>';
+    }
+
+    panel.insertBefore(card, panel.firstChild);
+    document.getElementById('btn-clear-sel').addEventListener('click', clearSelRings);
+
+    // Radar label hover tooltips
+    (function() {
+      var tip = document.getElementById('radar-label-tip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.id = 'radar-label-tip';
+        tip.style.cssText = 'position:fixed;z-index:9998;pointer-events:none;opacity:0;transition:opacity .15s;background:#1a1030;border:1px solid rgba(138,56,245,.5);border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;';
+        document.body.appendChild(tip);
+      }
+      setTimeout(function() {
+        var svgTexts = document.querySelectorAll('#conn-result [data-fulllabel]');
+        svgTexts.forEach(function(el) {
+          el.addEventListener('mouseenter', function(e) {
+            tip.textContent = el.getAttribute('data-fulllabel');
+            tip.style.opacity = '1';
+          });
+          el.addEventListener('mousemove', function(e) {
+            tip.style.left = (e.clientX - tip.offsetWidth - 12) + 'px';
+            tip.style.top  = (e.clientY - 28) + 'px';
+          });
+          el.addEventListener('mouseleave', function() {
+            tip.style.opacity = '0';
+          });
+        });
+      }, 80);
+    })();
+
+    // Hide valor onírico button when comparing 2+ users
+    var btnValor = document.getElementById('btn-valor-onirico');
+    if (btnValor) btnValor.style.display = selUsers.length >= 2 ? 'none' : '';
+  }
+
+  // Re-assert all rings after any DOM change that might wipe opacity
+  function refreshRings() {
+    selUsers.forEach(function(u, i) {
+      document.querySelectorAll('.user-node').forEach(function(g) {
+        var lbl = g.querySelector('text');
+        if (lbl && lbl.textContent.trim() === u.name.split(' ')[0]) {
+          g.style.opacity = '1';
+          addSelRing(g, ringColors[i]);
+        }
+      });
+    });
+  }
+
+  usersLayer.addEventListener('click', function(e) {
+    var g = e.target.closest ? e.target.closest('.user-node') : null;
+    if (!g) return;
+    var lbl = g.querySelector('text');
+    if (!lbl) return;
+    var firstName = lbl.textContent.trim();
+    var clicked = null;
+    for (var i = 0; i < state.users.length; i++) {
+      if (state.users[i].name.split(' ')[0] === firstName) { clicked = state.users[i]; break; }
+    }
+    if (!clicked) return;
+
+    // If already in selection mode, stop showUserPanel from firing
+    if (selUsers.length > 0) {
+      e.stopImmediatePropagation();
+    }
+
+    var existIdx = selUsers.indexOf(clicked);
+    if (existIdx !== -1) {
+      selUsers.splice(existIdx, 1);
+      var ring = g.querySelector('.sel-ring');
+      if (ring) ring.remove();
+      refreshRings();
+      renderConnectPanel();
+      return;
+    }
+    if (selUsers.length >= 3) return;
+    selUsers.push(clicked);
+    document.querySelectorAll('.user-node').forEach(function(n) {
+      n.style.opacity = '0.25';
+    });
+    refreshRings();
+    addSelRing(g, ringColors[selUsers.length - 1]);
+    g.style.opacity = '1';
+    renderConnectPanel();
+  }, true);
+
+  constSvg.addEventListener('click', function(e) {
+    if (e.target.closest && e.target.closest('.user-node')) return;
+    if (e.target.closest && e.target.closest('.cluster-node')) return;
+    clearSelRings();
+  });
+
+})();
+</script>
+
+</body>
+</html>

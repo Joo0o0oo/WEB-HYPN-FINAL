@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hypn — Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+  :root {
+    --bg-0:#ffffff; --bg-1:#faf9ff; --bg-tint:#f5f3ff; --bg-card:#ffffff;
+    --p0:#faf5ff; --p1:#ede9fe; --p2:#c4b5fd; --p3:#a78bfa; --p4:#8A38F5; --p5:#7c3aed; --p6:#6d28d9; --p7:#4c1d95;
+    --t0:#0a0820; --t60:rgba(10,8,32,.60); --t40:rgba(10,8,32,.40); --t20:rgba(10,8,32,.20); --t10:rgba(10,8,32,.10);
+    --green:#16a34a; --green-bg:rgba(22,163,74,.08);
+    --border:rgba(138,56,245,.13); --border-h:rgba(138,56,245,.35);
+    --shadow-s:0 1px 4px rgba(10,8,32,.07),0 4px 16px rgba(10,8,32,.05);
+    --shadow-m:0 2px 8px rgba(10,8,32,.06),0 16px 40px rgba(10,8,32,.08);
+    --shadow-l:0 4px 16px rgba(138,56,245,.12),0 24px 64px rgba(138,56,245,.10);
+    --f-head:'Space Grotesk',sans-serif; --f-body:'Inter',sans-serif; --f-mono:'JetBrains Mono',monospace;
+    --r-s:8px; --r-m:12px; --r-l:20px; --r-f:9999px;
+    --ease:cubic-bezier(.4,0,.2,1); --t:.25s;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{opacity:0;transition:opacity .4s ease;}
+  html.page-ready{opacity:1;}
+  body{background:var(--bg-1);color:var(--t0);font-family:var(--f-body);min-height:100vh;-webkit-font-smoothing:antialiased;padding-left:72px;}
+  ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:#f5f3ff;}::-webkit-scrollbar-thumb{background:var(--p3);border-radius:2px;}
+
+  /* ─── SIDENAV ─── */
+  .sidenav{display:none !important;position:fixed;left:0;top:0;bottom:0;z-index:200;width:72px;display:flex;flex-direction:column;align-items:center;padding:22px 0 26px;border-right:1px solid var(--border);background:rgba(255,255,255,.85);backdrop-filter:blur(12px);}
+  .sidenav__logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--p4),var(--p3));display:flex;align-items:center;justify-content:center;margin-bottom:16px;flex-shrink:0;}
+  .sidenav__items{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:8px;}
+  .sidenav__item{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--t40);text-decoration:none;transition:background var(--t) var(--ease),color var(--t) var(--ease);}
+  .sidenav__item:hover{background:var(--p1);color:var(--p4);}
+  .sidenav__item.is-active{background:var(--p1);color:var(--p4);}
+
+  /* ─── NAV BAR ─── */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(255,255,255,.9);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);}
+  .nav__back{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--t60);text-decoration:none;transition:color var(--t) var(--ease);letter-spacing:.02em;}
+  .nav__back:hover{color:var(--p4);}
+  .nav__back svg{transition:transform var(--t) var(--ease);}
+  .nav__back:hover svg{transform:translateX(-3px);}
+  .nav__brand{display:flex;align-items:center;gap:8px;font-family:var(--f-head);font-size:13px;font-weight:700;color:var(--t0);letter-spacing:-.01em;}
+  .nav__steps{display:flex;align-items:center;gap:8px;}
+  .nav__step{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--t40);}
+  .nav__step span{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1.5px solid var(--t20);}
+  .nav__step.active{color:var(--p4);}
+  .nav__step.active span{background:var(--p4);border-color:var(--p4);color:#fff;}
+  .nav__step.done span{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+  .nav__sep{width:24px;height:1px;background:var(--t20);}
+
+  /* ─── PAGE LAYOUT ─── */
+  .page{min-height:100vh;display:flex;flex-direction:column;}
+  .checkout-wrap{flex:1;display:grid;grid-template-columns:1fr 400px;gap:32px;max-width:1080px;margin:0 auto;width:100%;padding:92px 48px 80px;}
+  @media(max-width:860px){.checkout-wrap{grid-template-columns:1fr;padding:92px 24px 80px;}}
+
+  /* ─── LEFT COLUMN ─── */
+  .co-eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--p4);margin-bottom:8px;}
+  .co-title{font-family:var(--f-head);font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--t0);margin-bottom:6px;}
+  .co-subtitle{font-size:13px;color:var(--t60);margin-bottom:32px;line-height:1.6;}
+
+  /* Fever badge */
+  .fever-connect{display:flex;align-items:flex-start;gap:12px;background:var(--p1);border:1px solid rgba(138,56,245,.25);border-radius:var(--r-m);padding:14px 18px;margin-bottom:32px;}
+  .fever-dot{width:8px;height:8px;border-radius:50%;background:var(--p4);box-shadow:0 0 6px rgba(138,56,245,.5);margin-top:4px;flex-shrink:0;animation:f-pulse 2s ease-in-out infinite;}
+  @keyframes f-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+  .fever-connect__text{font-size:12px;color:var(--t60);line-height:1.6;}
+  .fever-connect__text strong{color:var(--p5);font-weight:600;}
+
+  /* Section label */
+  .co-section-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t40);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  .form-section{margin-bottom:28px;}
+
+  /* Form fields */
+  .form-group{margin-bottom:14px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-label{display:block;font-size:11px;font-weight:600;color:var(--t60);margin-bottom:6px;}
+  .form-input{width:100%;background:#fff;border:1.5px solid rgba(10,8,32,.12);border-radius:var(--r-m);padding:11px 14px;font-family:var(--f-body);font-size:13px;color:var(--t0);outline:none;transition:border-color var(--t) var(--ease),box-shadow var(--t) var(--ease);}
+  .form-input::placeholder{color:var(--t40);}
+  .form-input:focus{border-color:var(--p4);box-shadow:0 0 0 3px rgba(138,56,245,.10);}
+  .form-input--mono{font-family:var(--f-mono);letter-spacing:.08em;}
+
+  /* Card brand chips */
+  .card-icons{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .card-icon{height:24px;border-radius:5px;background:#f4f3ff;border:1px solid var(--border);padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--t60);display:flex;align-items:center;}
+
+  /* Submit */
+  .co-submit{width:100%;padding:15px 24px;background:linear-gradient(135deg,var(--p4) 0%,var(--p5) 100%);border:none;border-radius:var(--r-m);font-family:var(--f-head);font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:opacity var(--t) var(--ease),transform var(--t) var(--ease),box-shadow var(--t) var(--ease);letter-spacing:.02em;box-shadow:0 6px 20px rgba(138,56,245,.30);}
+  .co-submit:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 10px 28px rgba(138,56,245,.38);}
+  .co-submit:active{transform:translateY(0);}
+  .co-submit:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+  .co-secure{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:11px;color:var(--t40);}
+
+  /* ─── RIGHT COLUMN (SUMMARY) ─── */
+  .checkout-summary-col{position:sticky;top:92px;height:fit-content;}
+  .summary-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-l);padding:26px;box-shadow:var(--shadow-m);}
+
+  .sum-plan-row{display:flex;align-items:center;gap:14px;padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  .sum-plan-orb{width:46px;height:46px;border-radius:14px;background:var(--p1);border:1px solid rgba(138,56,245,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sum-plan-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p4);margin-bottom:3px;}
+  .sum-plan-name{font-family:var(--f-head);font-size:18px;font-weight:700;color:var(--t0);}
+
+  .sum-features{display:flex;flex-direction:column;margin-bottom:20px;}
+  .sum-feature{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(10,8,32,.05);}
+  .sum-feature:last-child{border-bottom:none;}
+  .sum-feature__check{width:16px;height:16px;border-radius:4px;background:var(--p1);border:1px solid rgba(138,56,245,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .sum-feature__check svg{color:var(--p4);}
+  .sum-feature__name{font-size:12px;font-weight:600;color:var(--t0);}
+  .sum-feature__desc{font-size:11px;color:var(--t60);line-height:1.5;margin-top:2px;}
+
+  .sum-total{background:var(--bg-tint);border:1px solid var(--border);border-radius:var(--r-m);padding:16px 18px;margin-bottom:14px;}
+  .sum-total__row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--t60);margin-bottom:8px;}
+  .sum-total__row:last-child{margin-bottom:0;padding-top:10px;border-top:1px solid var(--border);font-size:14px;font-weight:700;color:var(--t0);}
+  .sum-total__row:last-child .sum-total__amount{font-family:var(--f-mono);color:var(--p5);}
+  .sum-free-tag{font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);padding:2px 8px;border-radius:var(--r-f);}
+
+  .sum-fever-badge{display:flex;align-items:center;gap:9px;padding:11px 14px;background:var(--p1);border:1px solid rgba(138,56,245,.2);border-radius:var(--r-s);font-size:11px;color:var(--t60);}
+  .sum-fever-badge strong{color:var(--p5);}
+
+  /* ─── SUCCESS OVERLAY ─── */
+  .success-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px;text-align:center;}
+  .success-overlay.show{display:flex;animation:fade-in .45s var(--ease);}
+  @keyframes fade-in{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  .success-orb{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--p1),var(--p0));border:1.5px solid rgba(138,56,245,.3);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(138,56,245,.18);}
+  .success-title{font-family:var(--f-head);font-size:26px;font-weight:700;color:var(--t0);}
+  .success-sub{font-size:14px;color:var(--t60);line-height:1.7;max-width:400px;}
+  .success-back{margin-top:8px;padding:13px 32px;background:linear-gradient(135deg,var(--p4),var(--p5));border-radius:var(--r-f);font-family:var(--f-head);font-size:13px;font-weight:700;color:#fff;text-decoration:none;box-shadow:0 4px 16px rgba(138,56,245,.3);transition:opacity var(--t) var(--ease);}
+  .success-back:hover{opacity:.88;}
+
+  /* ─── FOOTER ─── */
+  .footer-strip{border-top:1px solid var(--border);background:#fff;padding:24px 48px;display:flex;align-items:center;gap:32px;}
+  .footer-tagline{font-size:11px;color:var(--t40);letter-spacing:.06em;}
+  .footer-copy{font-size:11px;color:var(--t20);margin-left:auto;}
+  </style>
+</head>
+<body>
+
+<!-- SIDENAV -->
+<aside class="sidenav">
+  <a href="hypn-home.html" class="sidenav__logo" aria-label="Hypn">
+    <svg width="20" height="20" viewBox="0 0 283 90" fill="none"><path d="M56.1506 74.7975L55.5911 74.8965C53.5563 75.2564 51.8824 75.27 50.0009 74.946L49.4414 74.847V42.2286L6.76335 42.2241L6.73176 75.2475L0.0045166 74.9775V2.5195H6.74079L6.78139 35.7903L49.4459 35.7724V2.5195H56.1371L56.1506 74.7975Z" fill="#fff"/><path d="M155.819 89.3026L155.372 89.4646C154.384 89.8245 153.432 90 152.398 90C151.631 90 150.819 89.901 149.926 89.7031L149.394 89.5906V2.5195H155.814V89.3026H155.819Z" fill="#fff"/></svg>
+  </a>
+  <div class="sidenav__items">
+    <a href="hypn-home.html" class="sidenav__item" title="Home">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    </a>
+    <a href="suscripciones.html" class="sidenav__item is-active" title="Suscripciones">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    </a>
+    <a href="sleep-stock.html" class="sidenav__item" title="Sleep Stock">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+    </a>
+    <a href="mercado.html" class="sidenav__item" title="Mercado">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </a>
+  </div>
+</aside>
+
+<!-- NAV -->
+<header class="nav">
+  <a href="suscripciones.html" class="nav__back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 7H2M6 3L2 7l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Volver a planes
+  </a>
+  <div class="nav__brand">
+    <svg width="72" height="23" viewBox="0 0 283 90" fill="none"><g clip-path="url(#chklogo)"><path d="M56.1506 74.7975L55.5911 74.8965C53.5563 75.2564 51.8824 75.27 50.0009 74.946L49.4414 74.847V42.2286L6.76335 42.2241L6.73176 75.2475L0.0045166 74.9775V2.5195H6.74079L6.78139 35.7903L49.4459 35.7724V2.5195H56.1371L56.1506 74.7975Z" fill="#8A38F5"/><path d="M283 63.6533H276.571L276.544 25.249L275.786 20.3359C275.118 16.0033 272.844 12.395 269.203 9.89352C264.614 6.74415 258.361 5.71836 252.057 7.08159C245.854 8.42232 241.039 12.404 238.856 18.0009C237.416 21.6947 236.712 25.0195 236.703 28.1599L236.618 63.5498L236.013 63.6128C234.971 63.7208 234.087 63.7747 233.22 63.7747C232.404 63.7747 231.6 63.7253 230.703 63.6308L230.098 63.5678V2.5195H236.591L236.681 9.12418C240.024 5.22796 243.58 2.82994 248.019 1.44871C255.744 -0.962805 263.919 -0.346428 270.452 3.14487C275.889 6.04679 279.666 10.6674 281.376 16.4982C282.463 20.201 282.968 23.2334 282.973 26.0408L283 63.6533Z" fill="#8A38F5"/><path d="M133.886 2.5195L99.9387 89.6626L92.9452 89.6671L104.324 60.5894L79.3734 2.5195H86.3263L107.695 52.0816L127.042 2.5195H133.886Z" fill="#8A38F5"/><path d="M178.274 62.398H178.247C177.566 62.461 176.975 62.4925 176.424 62.4925C175.211 62.4925 174.223 62.3351 173.04 61.9886L170.559 61.2598L173.081 60.6839C186.978 57.5075 196.669 45.5849 196.651 31.6872C196.633 17.704 187.271 6.22678 172.801 2.44754L169.065 1.47123L172.91 1.1203C180.526 0.42744 188.038 2.80296 194.052 7.80596C200.414 13.0969 204.484 20.8084 205.215 28.9517C206.704 45.5264 194.869 60.216 178.274 62.398Z" fill="#8A38F5"/><path d="M155.819 89.3026L155.372 89.4646C154.384 89.8245 153.432 90 152.398 90C151.631 90 150.819 89.901 149.926 89.7031L149.394 89.5906V2.5195H155.814V89.3026H155.819Z" fill="#8A38F5"/></g><defs><clipPath id="chklogo"><rect width="283" height="90" fill="white"/></clipPath></defs></svg>
+  </div>
+  <div class="nav__steps">
+    <div class="nav__step active"><span>1</span> Datos</div>
+    <div class="nav__sep"></div>
+    <div class="nav__step"><span>2</span> Pago</div>
+    <div class="nav__sep"></div>
+    <div class="nav__step"><span>3</span> Confirmación</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="checkout-wrap">
+
+    <!-- FORM -->
+    <div class="checkout-form-col" style="padding-right:8px;">
+      <p class="co-eyebrow" id="co-eyebrow">Plan · Fever AI</p>
+      <h1 class="co-title" id="co-title">Activar tu plan</h1>
+      <p class="co-subtitle" id="co-subtitle">Completá tus datos para iniciar la conexión con Fever.</p>
+
+      <div class="fever-connect">
+        <div class="fever-dot"></div>
+        <div class="fever-connect__text">
+          <strong>Fever AI</strong> se conectará a tu dispositivo la primera noche de activación y comenzará a mapear tu subconsciente automáticamente.
+        </div>
+      </div>
+
+      <form id="checkout-form" autocomplete="off">
+
+        <div class="form-section">
+          <p class="co-section-label">Datos de cuenta</p>
+          <div class="form-group">
+            <label class="form-label">Nombre completo</label>
+            <input type="text" class="form-input" placeholder="Tu nombre" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="tu@email.com" required/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Contraseña</label>
+              <input type="password" class="form-input" placeholder="Mínimo 8 caracteres" required/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmar contraseña</label>
+              <input type="password" class="form-input" placeholder="Repetir contraseña" required/>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <p class="co-section-label">Método de pago</p>
+          <div class="card-icons">
+            <div class="card-icon">VISA</div>
+            <div class="card-icon">MC</div>
+            <div class="card-icon">AMEX</div>
+            <div class="card-icon" style="font-size:8px;letter-spacing:.02em;">DEBIT</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Número de tarjeta</label>
+            <input type="text" class="form-input form-input--mono" placeholder="0000  0000  0000  0000" maxlength="19" id="card-num"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Vencimiento</label>
+              <input type="text" class="form-input form-input--mono" placeholder="MM / AA" maxlength="7" id="card-exp"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input type="text" class="form-input form-input--mono" placeholder="···" maxlength="4"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nombre en la tarjeta</label>
+            <input type="text" class="form-input" placeholder="Como figura en la tarjeta"/>
+          </div>
+        </div>
+
+        <button type="submit" class="co-submit" id="submit-btn">Activar y comenzar suscripción</button>
+        <p class="co-secure">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Pago seguro · Conexión encriptada SSL
+        </p>
+
+      </form>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="checkout-summary-col">
+      <div class="summary-card">
+        <div class="sum-plan-row">
+          <div class="sum-plan-orb">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--p4)" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div>
+            <div class="sum-plan-label" id="sum-label">Plan</div>
+            <div class="sum-plan-name" id="sum-name">—</div>
+          </div>
+        </div>
+
+        <div class="sum-features" id="sum-features"></div>
+
+        <div class="sum-total">
+          <div class="sum-total__row">
+            <span>Suscripción mensual</span>
+            <span id="sum-price-row">—</span>
+          </div>
+          <div class="sum-total__row">
+            <span>7 días de prueba</span>
+            <span class="sum-free-tag">Gratis</span>
+          </div>
+          <div class="sum-total__row">
+            <span>Total hoy</span>
+            <span class="sum-total__amount">USD 0,00</span>
+          </div>
+        </div>
+
+        <div class="sum-fever-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--p4)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span>Impulsado por <strong>Fever AI</strong> · Conexión subconsciente</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer-strip">
+    <svg width="283" height="90" viewBox="0 0 283 90" fill="none" style="height:15px;width:auto;"><path d="M56.1506 74.7975L55.5911 74.8965C53.5563 75.2564 51.8824 75.27 50.0009 74.946L49.4414 74.847V42.2286L6.76335 42.2241L6.73176 75.2475L0.0045166 74.9775V2.5195H6.74079L6.78139 35.7903L49.4459 35.7724V2.5195H56.1371L56.1506 74.7975Z" fill="#8A38F5"/><path d="M155.819 89.3026L155.372 89.4646C154.384 89.8245 153.432 90 152.398 90C151.631 90 150.819 89.901 149.926 89.7031L149.394 89.5906V2.5195H155.814V89.3026H155.819Z" fill="#8A38F5"/></svg>
+    <span class="footer-tagline">El inconsciente es el nuevo activo</span>
+    <span class="footer-copy">2045 Hypn Corp.</span>
+  </footer>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-orb">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--p4)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <h2 class="success-title">Fever está despierto.</h2>
+  <p class="success-sub" id="success-sub">Tu suscripción fue activada. Esta noche Fever comenzará a explorar tu subconsciente. Mañana tendrás tu primer reporte.</p>
+  <a href="hypn-home.html" class="success-back">Ir a HYPN →</a>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var PLANS = {
+    essential: {
+      label:'Plan Essential', name:'Essential', price:'29,90',
+      eyebrow:'Plan Essential · Fever AI',
+      submitText:'Activar Essential y comenzar suscripción',
+      features:[
+        {name:'Fever Base Connect',       desc:'Conexión nocturna básica con lecturas REM estándar.'},
+        {name:'Análisis de Sueño Diario', desc:'Reportes matutinos sobre calidad, duración y fases.'},
+        {name:'Perfil Subconsciente',     desc:'Fever construye tu mapa mental a lo largo del mes.'},
+        {name:'Wallet Limitada',          desc:'Conversión de datos oníricos en créditos HYPN.'},
+        {name:'Catálogo Público',         desc:'Acceso a 3 escenarios oníricos predeterminados.'},
+      ]
+    },
+    advanced: {
+      label:'Plan Advanced', name:'Advanced', price:'39,90',
+      eyebrow:'Plan Advanced · Fever AI',
+      submitText:'Activar Advanced y comenzar suscripción',
+      features:[
+        {name:'Fever Active Mode',    desc:'Fever procesa tus preferencias y ajusta el sueño en tiempo real.'},
+        {name:'Control de Temáticas', desc:'Seleccionás 3 temas por noche para guiar la narrativa onírica.'},
+        {name:'Ad-Lite',             desc:'Menos publicidad externa, más espacio para tus experiencias.'},
+        {name:'Multi-dispositivo',   desc:'Sincronización con todos tus wearables para datos precisos.'},
+        {name:'Trading Activo',      desc:'Vende tus sueños en Sleep Stock en tiempo real.'},
+      ]
+    },
+    ultra: {
+      label:'Plan Ultra', name:'Ultra', price:'59,90',
+      eyebrow:'Plan Ultra · Fever AI',
+      submitText:'Activar Ultra y comenzar suscripción',
+      features:[
+        {name:'Fever Core Access',          desc:'Acceso prioritario al núcleo del modelo, latencia mínima.'},
+        {name:'Análisis Profundo con IA',   desc:'Reportes avanzados: emociones, traumas y patrones cognitivos.'},
+        {name:'Ad-Free Total',              desc:'Sin publicidad de ningún tipo. Solo vos y tu subconsciente.'},
+        {name:'Wallet Premium',             desc:'Acceso completo al mercado de créditos oníricos.'},
+        {name:'Catálogo + Sleep Stock',     desc:'Ilimitado en escenarios y plataforma de trading.'},
+      ]
+    }
+  };
+
+  var CHECK_SVG = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  var params = new URLSearchParams(window.location.search);
+  var key = (params.get('plan') || 'essential').toLowerCase();
+  if (!PLANS[key]) key = 'essential';
+  var plan = PLANS[key];
+
+  document.getElementById('co-eyebrow').textContent  = plan.eyebrow;
+  document.getElementById('co-title').textContent    = 'Activar ' + plan.name;
+  document.getElementById('submit-btn').textContent  = plan.submitText;
+  document.getElementById('sum-label').textContent   = plan.label;
+  document.getElementById('sum-name').textContent    = plan.name;
+  document.getElementById('sum-price-row').textContent = 'USD ' + plan.price + ' / mes';
+  document.title = 'Hypn — Checkout · ' + plan.name;
+
+  var feat = document.getElementById('sum-features');
+  plan.features.forEach(function(f){
+    var d = document.createElement('div');
+    d.className = 'sum-feature';
+    d.innerHTML = '<div class="sum-feature__check">' + CHECK_SVG + '</div>'
+      + '<div><div class="sum-feature__name">' + f.name + '</div>'
+      + '<div class="sum-feature__desc">' + f.desc + '</div></div>';
+    feat.appendChild(d);
+  });
+
+  // Card number formatting
+  document.getElementById('card-num').addEventListener('input', function(){
+    var v = this.value.replace(/\D/g,'').slice(0,16);
+    this.value = v.match(/.{1,4}/g) ? v.match(/.{1,4}/g).join('  ') : v;
+  });
+  document.getElementById('card-exp').addEventListener('input', function(){
+    var v = this.value.replace(/\D/g,'').slice(0,4);
+    if(v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+    this.value = v;
+  });
+
+  // Submit
+  document.getElementById('checkout-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var btn = document.getElementById('submit-btn');
+    btn.textContent = 'Conectando con Fever…';
+    btn.disabled = true;
+    setTimeout(function(){
+      document.getElementById('success-sub').textContent =
+        'Tu plan ' + plan.name + ' fue activado. Esta noche Fever comenzará a explorar tu subconsciente. Mañana tendrás tu primer reporte onírico.';
+      document.getElementById('success-overlay').classList.add('show');
+    }, 1800);
+  });
+
+  document.documentElement.classList.add('page-ready');
+})();
+</script>
+</body>
+</html>

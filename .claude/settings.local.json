@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__eed7a710-6c54-4356-a1c8-d0558cc0304c__read_file_content",
+      "mcp__fec27506-6618-4c6b-b874-8ed7b2ef6b91__adobe_mandatory_init",
+      "mcp__fec27506-6618-4c6b-b874-8ed7b2ef6b91__asset_search"
+    ]
+  }
+}

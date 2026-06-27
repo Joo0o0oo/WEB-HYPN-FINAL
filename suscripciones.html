@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hypn — Suscripciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet"/>
+  <style>
+  :root {
+    --bg-0:#ffffff; --bg-1:#faf9ff; --bg-card:#ffffff; --bg-card-h:#faf8ff;
+    --p0:#faf5ff; --p1:#ede9fe; --p2:#c4b5fd; --p3:#a78bfa; --p4:#8A38F5; --p5:#7c3aed; --p6:#6d28d9; --p7:#4c1d95;
+    --t0:#0a0820; --t60:rgba(10,8,32,.60); --t40:rgba(10,8,32,.40); --t20:rgba(10,8,32,.20); --t10:rgba(10,8,32,.10);
+    --border:rgba(138,56,245,.11); --border-h:rgba(138,56,245,.32);
+    --shadow-s:0 1px 4px rgba(10,8,32,.07),0 4px 16px rgba(10,8,32,.05);
+    --shadow-m:0 2px 8px rgba(10,8,32,.06),0 12px 40px rgba(10,8,32,.08);
+    --shadow-l:0 4px 16px rgba(138,56,245,.10),0 24px 64px rgba(138,56,245,.12);
+    --glow-s:0 0 20px rgba(138,56,245,.18); --glow-m:0 0 40px rgba(138,56,245,.24);
+    --f-head:'Space Grotesk',sans-serif; --f-body:'Inter',sans-serif;
+    --r-s:8px; --r-m:14px; --r-l:22px; --r-f:9999px;
+    --ease:cubic-bezier(.4,0,.2,1); --spring:cubic-bezier(.34,1.56,.64,1); --t:.30s;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;opacity:0;transition:opacity .45s ease;}
+  html.page-ready{opacity:1;}
+  body{background:var(--bg-0);color:var(--t0);font-family:var(--f-body);overflow-x:hidden;-webkit-font-smoothing:antialiased;padding-left:72px;}
+  ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--bg-0);}::-webkit-scrollbar-thumb{background:var(--p3);border-radius:2px;}
+
+  /* ── SCENE BG ── */
+  .scene{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .scene__grid{position:absolute;inset:0;background-image:linear-gradient(rgba(138,56,245,.04)1px,transparent 1px),linear-gradient(90deg,rgba(138,56,245,.04)1px,transparent 1px);background-size:72px 72px;}
+  .scene__orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:0;animation:orbFade 2s ease forwards;}
+  .scene__orb--a{width:55vw;height:55vw;top:-20%;right:-10%;background:radial-gradient(circle,rgba(138,56,245,.09)0%,transparent 68%);animation-delay:.2s;}
+  .scene__orb--b{width:38vw;height:38vw;bottom:15%;left:-8%;background:radial-gradient(circle,rgba(167,139,250,.07)0%,transparent 68%);animation-delay:.5s;}
+  @keyframes orbFade{to{opacity:1;}}
+  .site{position:relative;z-index:1;}
+
+  /* ── NAV ── */
+  .nav{position:fixed;top:0;left:72px;right:0;z-index:300;height:48px;padding:0 44px;display:flex;align-items:center;justify-content:flex-start;background:rgba(255,255,255,0.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:background var(--t) var(--ease),box-shadow var(--t) var(--ease);}
+  .nav.is-scrolled{background:rgba(255,255,255,0.95);box-shadow:0 1px 0 var(--border);}
+  .nav__links{display:flex;align-items:center;gap:0;list-style:none;height:100%;}
+  .nav__links a{font-family:var(--f-body);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--t60);text-decoration:none;padding:0 22px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:color var(--t) var(--ease),border-color var(--t) var(--ease);white-space:nowrap; }
+  .nav__links a:hover{color:var(--t0);}
+  .nav__links a.is-active{color:var(--p4);border-bottom-color:var(--p4);}
+  .nav__links a.nav-sleep-stock{color:var(--p4);font-weight:700;}
+
+  /* ── SIDEBAR ── */
+  .sidenav{position:fixed;left:0;top:0;bottom:0;z-index:200;width:72px;display:flex;flex-direction:column;align-items:center;padding:22px 0 26px;border-right:1px solid var(--border);background:rgba(255,255,255,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+  .sidenav__heading{font-family:var(--f-body);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t40);align-self:flex-start;padding-left:18px;margin-bottom:5px;}
+  .sidenav__heading-line{width:18px;height:1px;background:var(--t20);align-self:flex-start;margin-left:18px;}
+  .sidenav__items{flex:1;width:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:center;position:relative;padding:8px 0 4px;}
+  .sidenav__track{position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);background:linear-gradient(to bottom,transparent 0%,var(--t20)8%,var(--t20)92%,transparent 100%);}
+  .sidenav__item{flex:1;width:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;position:relative;cursor:pointer;z-index:1;}
+  .sidenav__dot-wrap{width:20px;height:20px;display:flex;align-items:center;justify-content:center;}
+  .sidenav__dot{width:5px;height:5px;border-radius:50%;background:transparent;border:1.5px solid var(--t20);transition:all var(--t) var(--spring);}
+  .sidenav__item:hover .sidenav__dot{border-color:var(--p4);background:var(--p2);transform:scale(1.3);}
+  .sidenav__item.is-active .sidenav__dot{background:var(--p4);border-color:var(--p4);width:7px;height:7px;box-shadow:0 0 0 4px rgba(138,56,245,.15);}
+  .sidenav__num{font-family:var(--f-body);font-size:8px;font-weight:700;letter-spacing:.06em;color:transparent;transition:color var(--t) var(--ease);line-height:1;}
+  .sidenav__item.is-active .sidenav__num{color:var(--p4);}
+  .sidenav__label{position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);font-family:var(--f-body);font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--p4);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity var(--t) var(--ease);background:#fff;padding:3px 8px;border-radius:4px;border:1px solid var(--border);box-shadow:var(--shadow-s);}
+  .sidenav__item:hover .sidenav__label,.sidenav__item.is-active .sidenav__label{opacity:1;}
+
+  /* ── SHARED ── */
+  .section{position:relative;z-index:1;padding:96px 52px 96px 48px;}
+  .section--border{border-top:1px solid var(--border);}
+  .section--tint{background:var(--bg-1);}
+  .section__inner{max-width:1280px;margin:0 auto;}
+  .eyebrow{font-family:var(--f-body);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--p4);margin-bottom:10px;}
+  .section-title{font-family:var(--f-head);font-size:clamp(22px,2.8vw,36px);font-weight:700;letter-spacing:0;color:var(--t0);text-align:center;margin-bottom:58px;}
+  .link-arrow{font-family:var(--f-body);display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--p4);text-decoration:none;transition:color var(--t) var(--ease);}
+  .link-arrow:hover{color:var(--p5);}
+
+  /* ── MARQUEE ── */
+  .marquee-wrap{position:absolute;top:32px;left:0;right:0;overflow:hidden;pointer-events:none;z-index:0;}
+  .marquee-track{display:flex;width:max-content;animation:marqueeScroll 28s linear infinite;}
+  .marquee-text{font-family:var(--f-head);font-size:clamp(60px,8vw,96px);font-weight:700;letter-spacing:-.02em;color:rgba(138,56,245,.055);white-space:nowrap;user-select:none;padding-right:40px;}
+  @keyframes marqueeScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ── HERO ── */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:120px 52px 80px 48px;overflow:hidden;}
+  .hero__inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;max-width:1280px;margin:0 auto;width:100%;position:relative;z-index:1;}
+  .hero__eyebrow{font-family:var(--f-body);display:inline-flex;align-items:center;gap:10px;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--p4);margin-bottom:20px;}
+  .hero__eyebrow::before{content:'—';letter-spacing:0;}
+  .hero__h1{font-family:var(--f-head);font-size:clamp(32px,3.8vw,54px);font-weight:700;line-height:1.08;letter-spacing:-.01em;color:var(--t0);margin-bottom:22px;}
+  .hero__h1 .accent{color:var(--p4);display:block;}
+  .hero__body{font-family:var(--f-body);font-size:14px;line-height:1.72;color:var(--t60);max-width:400px;margin-bottom:36px;}
+  .hero__cta-row{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  .hero__trust{display:flex;align-items:center;gap:8px;font-family:var(--f-body);font-size:11px;color:var(--t40);line-height:1.4;max-width:160px;}
+  .hero__trust svg{flex-shrink:0;color:var(--p4);}
+
+  /* 3D Torus */
+  .torus-wrap{display:flex;align-items:center;justify-content:center;position:relative;padding:20px;}
+  .torus-glow{position:absolute;inset:-60px;background:radial-gradient(ellipse at center,rgba(138,56,245,.12)0%,transparent 65%);border-radius:50%;pointer-events:none;}
+  .torus-orb{position:relative;display:flex;align-items:center;justify-content:center;}
+  .torus{
+    width:200px;height:200px;border-radius:50%;
+    border:52px solid transparent;
+    background:
+      radial-gradient(ellipse at 35% 30%,rgba(196,181,253,.9),rgba(138,56,245,.85) 45%,rgba(76,29,149,.7)) border-box,
+      radial-gradient(ellipse at center,rgba(240,230,255,.3),rgba(138,56,245,.1)) padding-box;
+    box-shadow:
+      0 0 60px rgba(138,56,245,.45),
+      0 20px 60px rgba(76,29,149,.30),
+      inset 0 0 30px rgba(196,181,253,.2);
+    transform:perspective(600px) rotateX(18deg) rotateZ(-8deg);
+    animation:torusBob 5s ease-in-out infinite;
+  }
+  @keyframes torusBob{0%,100%{transform:perspective(600px)rotateX(18deg)rotateZ(-8deg)translateY(0);}50%{transform:perspective(600px)rotateX(18deg)rotateZ(-8deg)translateY(-12px);}}
+  .torus-bubble{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.35)0%,transparent 70%);animation:bubblePulse 4s ease-in-out infinite;}
+  .torus-bubble--1{width:280px;height:280px;top:-40px;right:-30px;animation-delay:0s;}
+  .torus-bubble--2{width:180px;height:180px;bottom:-20px;left:-10px;animation-delay:1s;}
+  .torus-bubble--3{width:120px;height:120px;top:20px;left:-40px;animation-delay:2s;}
+  @keyframes bubblePulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.06);opacity:.25;}}
+
+  /* ── TODOS LOS PLANES INCLUYEN ── */
+  .features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-l);overflow:hidden;box-shadow:var(--shadow-s);}
+  .feature-item{background:var(--bg-card);padding:40px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;transition:background var(--t) var(--ease);}
+  .feature-item:hover{background:var(--bg-1);}
+  .feature-icon{width:52px;height:52px;display:flex;align-items:center;justify-content:center;color:var(--p4);}
+  .feature-title{font-family:var(--f-head);font-size:13.5px;font-weight:600;color:var(--t0);letter-spacing:-.01em;line-height:1.25;}
+  .feature-desc{font-family:var(--f-body);font-size:12px;color:var(--t60);line-height:1.55;}
+
+  /* ── PRICING ── */
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .plan-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-l);padding:32px 28px;display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow-s);transition:box-shadow var(--t) var(--ease),border-color var(--t) var(--ease);}
+  .plan-card:hover{box-shadow:var(--shadow-l);border-color:var(--border-h);}
+  .plan-card--featured{border-color:rgba(138,56,245,.35);box-shadow:var(--shadow-l);}
+  .plan-header{margin-bottom:20px;}
+  .plan-label-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .plan-label{font-family:var(--f-body);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--p4);}
+  .plan-badge{font-family:var(--f-body);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--p4);color:#fff;padding:3px 9px;border-radius:var(--r-f);}
+  .plan-price{font-family:var(--f-head);font-size:36px;font-weight:700;letter-spacing:-.03em;color:var(--t0);line-height:1;}
+  .plan-price span{font-size:14px;font-weight:500;color:var(--t60);letter-spacing:0;}
+  .plan-desc{font-family:var(--f-body);font-size:12.5px;color:var(--t60);line-height:1.6;margin-top:10px;}
+  .plan-orb-wrap{width:100%;display:flex;align-items:center;justify-content:center;padding:28px 0;min-height:160px;}
+  .plan-features{display:flex;flex-direction:column;gap:0;margin-bottom:28px;flex:1;}
+  .plan-feature{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);}
+  .plan-feature:last-child{border-bottom:none;}
+  .plan-feature__check{width:16px;height:16px;border-radius:4px;background:var(--p1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .plan-feature__check svg{color:var(--p5);}
+  .plan-feature__content{}
+  .plan-feature__name{font-family:var(--f-body);font-size:12.5px;font-weight:600;color:var(--t0);margin-bottom:2px;}
+  .plan-feature__desc{font-family:var(--f-body);font-size:11px;color:var(--t60);line-height:1.5;}
+  .plan-cta{font-family:var(--f-body);font-size:12.5px;font-weight:600;color:var(--p4);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color var(--t) var(--ease),gap var(--t) var(--spring);}
+  .plan-cta:hover{color:var(--p5);gap:10px;}
+
+  /* ── PLAN ORBS (reused from home) ── */
+  .orb-c{width:110px;height:110px;position:relative;}
+  .orb-c__core{width:100%;height:100%;border-radius:50%;background:radial-gradient(ellipse at 36% 32%,#e879f9,#8A38F5 46%,#3b0764);box-shadow:0 0 50px rgba(232,121,249,.35),0 0 25px rgba(138,56,245,.3);animation:morphBloom 7s ease-in-out infinite;}
+  .orb-c__ring{position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(232,121,249,.20);animation:ringPulse 3s ease-in-out infinite;}
+  .orb-a{position:relative;width:100px;height:100px;}
+  .orb-a__glow{position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,rgba(138,56,245,.20)0%,transparent 70%);}
+  .orb-a__shape{width:100%;height:100%;background:linear-gradient(135deg,rgba(167,139,250,.95),rgba(99,102,241,.80),rgba(76,29,149,.90));clip-path:polygon(50% 0%,92% 25%,92% 75%,50% 100%,8% 75%,8% 25%);box-shadow:0 0 45px rgba(138,56,245,.40);animation:rotateSlow 18s linear infinite;position:relative;}
+  .orb-a__shape::after{content:'';position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,.25)0%,transparent 50%);clip-path:polygon(50% 0%,92% 25%,92% 75%,50% 100%,8% 75%,8% 25%);}
+  .orb-p{width:100px;height:100px;position:relative;}
+  .orb-p__void{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at center,#0d0720 0%,#1e0a3c 35%,#4c1d95 62%,transparent 82%);box-shadow:0 0 45px rgba(124,58,237,.38);}
+  .orb-p__ring{position:absolute;border-radius:50%;border:1.5px solid rgba(138,56,245,.35);animation:vortexSpin linear infinite;}
+  .orb-p__ring:nth-child(2){inset:-10px;border-color:rgba(138,56,245,.22);animation-duration:5s;}
+  .orb-p__ring:nth-child(3){inset:-22px;border-color:rgba(138,56,245,.11);animation-duration:9s;animation-direction:reverse;}
+  .orb-p__ring:nth-child(4){inset:-36px;border-color:rgba(138,56,245,.06);animation-duration:15s;}
+  @keyframes morphBloom{0%,100%{border-radius:50%;}25%{border-radius:58% 42% 46% 54%/52% 56% 44% 48%;}50%{border-radius:44% 56% 52% 48%/58% 42% 58% 42%;}75%{border-radius:52% 48% 56% 44%/44% 58% 42% 56%;}}
+  @keyframes ringPulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.1);opacity:.12;}}
+  @keyframes rotateSlow{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  @keyframes vortexSpin{from{transform:rotate(0deg)scaleX(1);}50%{transform:rotate(180deg)scaleX(.68);}to{transform:rotate(360deg)scaleX(1);}}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  /* ── SCROLL REVEAL ── */
+  .sr{opacity:0;transform:translateY(24px);transition:opacity .65s var(--ease),transform .65s var(--ease);}
+  .sr.visible{opacity:1;transform:translateY(0);}
+  .sr-d1{transition-delay:.08s;}.sr-d2{transition-delay:.16s;}.sr-d3{transition-delay:.24s;}.sr-d4{transition-delay:.32s;}
+  .sr-now{opacity:1!important;transform:translateY(0)!important;}
+
+  /* ── FOOTER ── */
+  .footer-strip{position:relative;z-index:1;border-top:1px solid var(--border);padding:34px 52px;display:flex;align-items:center;justify-content:space-between;background:var(--bg-1);}
+  .footer-tagline{font-family:var(--f-body);font-size:10.5px;letter-spacing:.10em;text-transform:uppercase;color:var(--t40);}
+  .footer-copy{font-family:var(--f-body);font-size:11px;color:var(--t40);}
+  
+  /* ── RECOMENDADO DESDE EXPERIENCIA ── */
+  .plan-rec-banner{display:none;align-items:center;gap:8px;background:rgba(138,56,245,.1);border:1px solid rgba(138,56,245,.3);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-family:var(--f-body);font-size:11px;color:var(--p5);line-height:1.4;}
+  .plan-rec-banner svg{flex-shrink:0;}
+  .plan-card--recommended{border-color:rgba(138,56,245,.5) !important;box-shadow:0 0 0 3px rgba(138,56,245,.12), var(--shadow-l) !important;}
+  .plan-card--recommended .plan-rec-banner{display:flex;}
+</style>
+</head>
+<body>
+
+<div class="scene" aria-hidden="true">
+  <div class="scene__grid"></div>
+  <div class="scene__orb scene__orb--a"></div>
+  <div class="scene__orb scene__orb--b"></div>
+</div>
+
+<div class="site">
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <ul class="nav__links">
+    <li><a href="hypn-home.html">Home</a></li>
+    <li><a href="suscripciones.html" class="is-active">Suscripciones</a></li>
+    <li><a href="experiencias.html">Experiencias</a></li>
+    <li><a href="mercado.html">Mercado</a></li>
+    <li><a href="tecnologia.html">Tecnología</a></li>
+    <li><a href="sleep-stock.html" class="nav-sleep-stock">Sleep Stock</a></li>
+  </ul>
+</nav>
+
+<!-- SIDEBAR -->
+<nav class="sidenav" id="sidenav" aria-label="Navegación por secciones">
+  <span class="sidenav__heading">Nav</span>
+  <span class="sidenav__heading-line" aria-hidden="true"></span>
+  <div class="sidenav__items">
+    <div class="sidenav__track" aria-hidden="true"></div>
+    <a class="sidenav__item is-active" data-section="hero">
+      <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+      <span class="sidenav__num">01</span>
+      <span class="sidenav__label">Inicio</span>
+    </a>
+    <a class="sidenav__item" data-section="section-features">
+      <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+      <span class="sidenav__num">02</span>
+      <span class="sidenav__label">Incluye</span>
+    </a>
+    <a class="sidenav__item" data-section="section-plans">
+      <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+      <span class="sidenav__num">03</span>
+      <span class="sidenav__label">Planes</span>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="hero">
+  <!-- Marquee -->
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-track">
+      <span class="marquee-text">DORMÍ &nbsp;·&nbsp; SOÑÁ &nbsp;·&nbsp; GANÁ &nbsp;·&nbsp; PLAN ESSENTIAL &nbsp;·&nbsp; PLAN ADVANCED &nbsp;·&nbsp; PLAN ULTRA &nbsp;·&nbsp; </span>
+      <span class="marquee-text">DORMÍ &nbsp;·&nbsp; SOÑÁ &nbsp;·&nbsp; GANÁ &nbsp;·&nbsp; PLAN ESSENTIAL &nbsp;·&nbsp; PLAN ADVANCED &nbsp;·&nbsp; PLAN ULTRA &nbsp;·&nbsp; </span>
+    </div>
+  </div>
+
+  <div class="hero__inner">
+    <div class="sr sr-now">
+      <p class="hero__eyebrow">Planes de suscripción · Powered by Fever AI</p>
+      <h1 class="hero__h1">
+        ELEGÍ TU PLAN Y DEJÁ QUE
+        <span class="accent">FEVER ENTRE EN TU MENTE</span>
+      </h1>
+      <p class="hero__body">Fever es el modelo de IA de HYPN entrenado para conectarse con tu subconsciente mientras dormís. Cada plan desbloquea un nivel diferente de profundidad neural, personalización y retorno sobre tus sueños.</p>
+      <div class="hero__cta-row">
+        <a href="#section-plans" class="link-arrow" id="cta-plans">
+          Ver planes disponibles
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div class="hero__trust">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Conexión neural encriptada · ISO 27001
+        </div>
+      </div>
+    </div>
+
+    <div class="sr sr-now sr-d2">
+      <div class="torus-wrap">
+        <div class="torus-glow" aria-hidden="true"></div>
+        <div class="torus-orb">
+          <div class="torus-bubble torus-bubble--1" aria-hidden="true"></div>
+          <div class="torus-bubble torus-bubble--2" aria-hidden="true"></div>
+          <div class="torus-bubble torus-bubble--3" aria-hidden="true"></div>
+          <div class="torus"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TODOS LOS PLANES INCLUYEN -->
+<section class="section section--border" id="section-features">
+  <div class="section__inner">
+    <h2 class="section-title sr">TODOS LOS PLANES INCLUYEN</h2>
+    <div class="features-grid">
+      <div class="feature-item sr sr-d1">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="rgba(138,56,245,.25)" stroke-width="1.5"/><circle cx="20" cy="20" r="12" stroke="rgba(138,56,245,.4)" stroke-width="1.5"/><circle cx="20" cy="20" r="6" stroke="var(--p4)" stroke-width="2"/><circle cx="20" cy="20" r="2" fill="var(--p4)"/></svg>
+        </div>
+        <p class="feature-title">Conexión Fever al subconsciente</p>
+        <p class="feature-desc">Fever se sincroniza con tus ondas cerebrales durante el sueño REM para leer, registrar y amplificar tus experiencias oníricas.</p>
+      </div>
+      <div class="feature-item sr sr-d2">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 8C13.4 8 8 13.4 8 20c0 4.4 2.3 8.3 5.7 10.5" stroke="var(--p4)" stroke-width="2" stroke-linecap="round"/><path d="M20 8c6.6 0 12 5.4 12 12 0 4.4-2.3 8.3-5.7 10.5" stroke="rgba(138,56,245,.4)" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="20" r="4" fill="var(--p4)"/><path d="M20 16v4l3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <p class="feature-title">Análisis neural en tiempo real</p>
+        <p class="feature-desc">Fever procesa actividad cerebral durante la noche y genera reportes de patrones cognitivos, emociones y fases de sueño al despertar.</p>
+      </div>
+      <div class="feature-item sr sr-d3">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 6l2.5 6h6.5l-5 4 2 6.5L20 19l-6 3.5 2-6.5-5-4h6.5z" stroke="var(--p4)" stroke-width="1.8" stroke-linejoin="round"/><circle cx="20" cy="30" r="3" fill="rgba(138,56,245,.3)" stroke="var(--p4)" stroke-width="1.5"/></svg>
+        </div>
+        <p class="feature-title">Perfil onírico personalizado</p>
+        <p class="feature-desc">Fever aprende tu arquitectura mental única con cada noche y construye un perfil que mejora la precisión de sus predicciones mes a mes.</p>
+      </div>
+      <div class="feature-item sr sr-d4">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 8v4M20 28v4M8 20h4M28 20h4" stroke="rgba(138,56,245,.4)" stroke-width="1.8" stroke-linecap="round"/><circle cx="20" cy="20" r="8" stroke="var(--p4)" stroke-width="2"/><path d="M17 20l2 2 4-4" stroke="var(--p4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <p class="feature-title">Actualizaciones continuas de Fever</p>
+        <p class="feature-desc">El modelo se actualiza automáticamente con nuevas capacidades de lectura subconsciente sin interrumpir tu rutina de sueño.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANES -->
+<section class="section section--border section--tint" id="section-plans">
+  <div class="section__inner">
+    <h2 class="section-title sr">ENCONTRÁ EL PLAN IDEAL PARA VOS</h2>
+    <div class="pricing-grid">
+
+      <!-- ESSENTIAL -->
+      <div class="plan-card sr sr-d1" data-plan="essential">
+        <div class="plan-rec-banner"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3.5L12 5l-2.5 2.4.6 3.6L7 9.5 4 11l.6-3.6L2 5l3.5-.5L7 1z" fill="#8A38F5"/></svg><span id="rec-text-essential"></span></div>
+        <div class="plan-header">
+          <div class="plan-label-row"><span class="plan-label">Plan Essential</span></div>
+          <p class="plan-price">29,90 USD <span>/mes</span></p>
+          <p class="plan-desc">Fever se activa en modo base: lee tus sueños, genera reportes diarios y empieza a construir tu perfil subconsciente.</p>
+        </div>
+        <div class="plan-orb-wrap">
+          <div class="orb-c" style="filter:url(#gooey)"><div class="orb-c__core"></div><div class="orb-c__ring"></div></div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Análisis de Sueño Básico</p><p class="plan-feature__desc">Reportes diarios sobre calidad y duración.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Publicidad Estándar</p><p class="plan-feature__desc">Inserción de anuncios de marcas masivas en fase REM.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Wallet Limitada</p><p class="plan-feature__desc">Conversión de datos en créditos para tiendas seleccionadas.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Catálogo Público</p><p class="plan-feature__desc">Acceso a 3 escenarios oníricos predeterminados.</p></div>
+          </div>
+        </div>
+        <a href="checkout.html?plan=essential" class="plan-cta">Activar Essential <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M7.5 3l3.5 3.5L7.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+
+      <!-- ADVANCED (featured) -->
+      <div class="plan-card plan-card--featured sr sr-d2" data-plan="advanced">
+        <div class="plan-rec-banner"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3.5L12 5l-2.5 2.4.6 3.6L7 9.5 4 11l.6-3.6L2 5l3.5-.5L7 1z" fill="#8A38F5"/></svg><span id="rec-text-advanced"></span></div>
+        <div class="plan-header">
+          <div class="plan-label-row"><span class="plan-label">Plan Advanced</span><span class="plan-badge">Más elegido</span></div>
+          <p class="plan-price">39,90 USD <span>/mes</span></p>
+          <p class="plan-desc">Fever en modo activo: podés guiar las temáticas de tus sueños y el modelo adapta el entorno onírico según tus preferencias en tiempo real.</p>
+        </div>
+        <div class="plan-orb-wrap">
+          <div class="orb-a"><div class="orb-a__glow"></div><div class="orb-a__shape"></div></div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Control de Temáticas</p><p class="plan-feature__desc">Selección de 3 temas específicos para inducir cada noche.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Ad-Lite</p><p class="plan-feature__desc">Menos publicidad externa para priorizar tus propias experiencias.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Multi-dispositivo</p><p class="plan-feature__desc">Sincronización con todos tus wearables para datos precisos.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Trading Activo</p><p class="plan-feature__desc">Acceso al mercado de valores para vender tus sueños en tiempo real.</p></div>
+          </div>
+        </div>
+        <a href="checkout.html?plan=advanced" class="plan-cta">Activar Advanced <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M7.5 3l3.5 3.5L7.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+
+      <!-- ULTRA -->
+      <div class="plan-card sr sr-d3" data-plan="ultra">
+        <div class="plan-rec-banner"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3.5L12 5l-2.5 2.4.6 3.6L7 9.5 4 11l.6-3.6L2 5l3.5-.5L7 1z" fill="#8A38F5"/></svg><span id="rec-text-ultra"></span></div>
+        <div class="plan-header">
+          <div class="plan-label-row"><span class="plan-label">Plan Ultra</span></div>
+          <p class="plan-price">59,90 USD <span>/mes</span></p>
+          <p class="plan-desc">Fever sin límites: acceso completo al núcleo del modelo, personalización total del subconsciente y prioridad absoluta en procesamiento neural.</p>
+        </div>
+        <div class="plan-orb-wrap">
+          <div class="orb-p"><div class="orb-p__void"></div><div class="orb-p__ring"></div><div class="orb-p__ring"></div><div class="orb-p__ring"></div></div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Análisis de Sueño Profundo</p><p class="plan-feature__desc">Reportes avanzados con IA sobre emociones y patrones cognitivos.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Ad-Free</p><p class="plan-feature__desc">Sin publicidad de terceros. Solo tus propias experiencias.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Wallet Premium</p><p class="plan-feature__desc">Acceso al mercado completo de créditos oníricos.</p></div>
+          </div>
+          <div class="plan-feature">
+            <div class="plan-feature__check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="plan-feature__content"><p class="plan-feature__name">Catálogo Completo + Sleep Stock</p><p class="plan-feature__desc">Acceso ilimitado a escenarios y a la plataforma de trading onírico.</p></div>
+          </div>
+        </div>
+        <a href="checkout.html?plan=ultra" class="plan-cta">Activar Ultra <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M7.5 3l3.5 3.5L7.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer-strip">
+  <svg width="283" height="90" viewBox="0 0 283 90" fill="none" style="height:20px;width:auto;"><g clip-path="url(#fc3)"><path d="M56.1506 74.7975L55.5911 74.8965C53.5563 75.2564 51.8824 75.27 50.0009 74.946L49.4414 74.847V42.2286L6.76335 42.2241L6.73176 75.2475L0.0045166 74.9775V2.5195H6.74079L6.78139 35.7903L49.4459 35.7724V2.5195H56.1371L56.1506 74.7975Z" fill="#8A38F5"/><path d="M283 63.6533H276.571L276.544 25.249L275.786 20.3359C275.118 16.0033 272.844 12.395 269.203 9.89352C264.614 6.74415 258.361 5.71836 252.057 7.08159C245.854 8.42232 241.039 12.404 238.856 18.0009C237.416 21.6947 236.712 25.0195 236.703 28.1599L236.618 63.5498L236.013 63.6128C234.971 63.7208 234.087 63.7747 233.22 63.7747C232.404 63.7747 231.6 63.7253 230.703 63.6308L230.098 63.5678V2.5195H236.591L236.681 9.12418C240.024 5.22796 243.58 2.82994 248.019 1.44871C255.744 -0.962805 263.919 -0.346428 270.452 3.14487C275.889 6.04679 279.666 10.6674 281.376 16.4982C282.463 20.201 282.968 23.2334 282.973 26.0408L283 63.6533Z" fill="#8A38F5"/><path d="M133.886 2.5195L99.9387 89.6626L92.9452 89.6671L104.324 60.5894L79.3734 2.5195H86.3263L107.695 52.0816L127.042 2.5195H133.886Z" fill="#8A38F5"/><path d="M178.274 62.398H178.247C177.566 62.461 176.975 62.4925 176.424 62.4925C175.211 62.4925 174.223 62.3351 173.04 61.9886L170.559 61.2598L173.081 60.6839C186.978 57.5075 196.669 45.5849 196.651 31.6872C196.633 17.704 187.271 6.22678 172.801 2.44754L169.065 1.47123L172.91 1.1203C180.526 0.42744 188.038 2.80296 194.052 7.80596C200.414 13.0969 204.484 20.8084 205.215 28.9517C206.704 45.5264 194.869 60.216 178.274 62.398Z" fill="#8A38F5"/><path d="M155.819 89.3026L155.372 89.4646C154.384 89.8245 153.432 90 152.398 90C151.631 90 150.819 89.901 149.926 89.7031L149.394 89.5906V2.5195H155.814V89.3026H155.819Z" fill="#8A38F5"/></g><defs><clipPath id="fc3"><rect width="283" height="90" fill="white"/></clipPath></defs></svg>
+  <span class="footer-tagline">El inconsciente es el nuevo activo</span>
+  <span class="footer-copy">2045 Hypn Corp.</span>
+</footer>
+
+</div>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true"><defs><filter id="gooey"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="4" seed="5" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
+
+<script>
+(function(){
+  'use strict';
+
+  // NAV scroll
+  var nav = document.getElementById('nav');
+  window.addEventListener('scroll', function(){ nav.classList.toggle('is-scrolled', window.scrollY > 60); }, { passive: true });
+
+  // Sidebar
+  var sideItems = document.querySelectorAll('.sidenav__item');
+  var orderedIds = ['hero','section-features','section-plans'];
+  var sectionEls = orderedIds.map(function(id){ return document.getElementById(id); }).filter(Boolean);
+
+  function getAbsTop(el){ return el.getBoundingClientRect().top + window.scrollY; }
+
+  function updateSidenav(){
+    var trigger = window.scrollY + window.innerHeight * 0.3;
+    var activeId = sectionEls.length ? sectionEls[0].id : '';
+    for(var i=0;i<sectionEls.length;i++){
+      if(getAbsTop(sectionEls[i]) - 80 <= trigger) activeId = sectionEls[i].id;
+    }
+    sideItems.forEach(function(item){
+      item.classList.toggle('is-active', item.getAttribute('data-section') === activeId);
+    });
+  }
+
+  sideItems.forEach(function(item){
+    item.addEventListener('click', function(e){
+      e.preventDefault();
+      var target = document.getElementById(this.getAttribute('data-section'));
+      if(target) window.scrollTo({ top: Math.max(0, getAbsTop(target) - 80), behavior: 'smooth' });
+    });
+  });
+
+  window.addEventListener('scroll', updateSidenav, { passive: true });
+  updateSidenav();
+
+  // "Ir a planes" smooth scroll
+  var ctaPlans = document.getElementById('cta-plans');
+  if(ctaPlans){
+    ctaPlans.addEventListener('click', function(e){
+      e.preventDefault();
+      var target = document.getElementById('section-plans');
+      if(target) window.scrollTo({ top: Math.max(0, getAbsTop(target) - 80), behavior: 'smooth' });
+    });
+  }
+
+  // Scroll reveal
+  var srEls = document.querySelectorAll('.sr:not(.sr-now)');
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.10, rootMargin: '0px 0px -24px 0px' });
+  srEls.forEach(function(el){ obs.observe(el); });
+
+})();
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){document.documentElement.classList.add('page-ready');},20);});
+</script>
+
+<script>
+(function(){
+  var map = {
+    creatividad:   { plan:'advanced',  label:'Creatividad' },
+    aprendizaje:   { plan:'advanced',  label:'Aprendizaje' },
+    bienestar:     { plan:'essential', label:'Bienestar' },
+    profundizacion:{ plan:'ultra',     label:'Profundización' }
+  };
+  var params = new URLSearchParams(window.location.search);
+  var from = params.get('from');
+  if (!from || !map[from]) return;
+  var m = map[from];
+  var card = document.querySelector('[data-plan="'+m.plan+'"]');
+  if (!card) return;
+  card.classList.add('plan-card--recommended');
+  var span = document.getElementById('rec-text-'+m.plan);
+  if (span) span.textContent = 'Plan recomendado para tu objetivo: ' + m.label + '.';
+  // Scroll to plans section after a short delay
+  setTimeout(function(){
+    var sec = document.getElementById('section-plans');
+    if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 400);
+})();
+</script>
+</body>
+</html>

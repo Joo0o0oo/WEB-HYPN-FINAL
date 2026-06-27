@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hypn — Sleep Stock · El Mercado de los Sueños</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+  :root {
+    --bg-0:#06040f;--bg-1:#09070f;--bg-card:rgba(255,255,255,0.04);--bg-card-h:rgba(255,255,255,0.07);
+    --p0:#faf5ff;--p1:#ede9fe;--p2:#c4b5fd;--p3:#a78bfa;--p4:#8A38F5;--p5:#9d50ff;--p6:#b96fff;--p7:#4c1d95;
+    --t0:#ffffff;--t80:rgba(255,255,255,0.80);--t60:rgba(255,255,255,0.60);--t40:rgba(255,255,255,0.40);--t20:rgba(255,255,255,0.20);--t10:rgba(255,255,255,0.10);
+    --green:#22c55e;--green-bg:rgba(34,197,94,0.12);--red:#f87171;--red-bg:rgba(248,113,113,0.12);
+    --border:rgba(138,56,245,0.18);--border-h:rgba(138,56,245,0.40);
+    --shadow-s:0 1px 4px rgba(0,0,0,0.4),0 4px 16px rgba(0,0,0,0.3);
+    --shadow-m:0 2px 8px rgba(0,0,0,0.5),0 12px 40px rgba(0,0,0,0.4);
+    --shadow-l:0 4px 24px rgba(138,56,245,0.25),0 24px 64px rgba(138,56,245,0.15);
+    --glow-s:0 0 30px rgba(138,56,245,0.30);--glow-m:0 0 60px rgba(138,56,245,0.40);
+    --f-head:'Space Grotesk',sans-serif;--f-body:'Inter',sans-serif;--f-mono:'JetBrains Mono',monospace;
+    --r-s:8px;--r-m:14px;--r-l:22px;--r-f:9999px;
+    --ease:cubic-bezier(.4,0,.2,1);--spring:cubic-bezier(.34,1.56,.64,1);--t:.30s;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;opacity:0;transition:opacity .45s ease;}
+  html.page-ready{opacity:1;}
+  body{background:var(--bg-0);color:var(--t0);font-family:var(--f-body);overflow-x:hidden;-webkit-font-smoothing:antialiased;padding-left:72px;}
+  ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--bg-0);}::-webkit-scrollbar-thumb{background:var(--p4);border-radius:2px;}
+
+  /* ── AMBIENT SCENE ── */
+  .scene{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .scene__grid{position:absolute;inset:0;background-image:linear-gradient(rgba(138,56,245,0.06)1px,transparent 1px),linear-gradient(90deg,rgba(138,56,245,0.06)1px,transparent 1px);background-size:72px 72px;}
+  .scene__orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:0;animation:orbFade 2s ease forwards;}
+  .scene__orb--a{width:60vw;height:60vw;top:-20%;right:-10%;background:radial-gradient(circle,rgba(138,56,245,0.18)0%,transparent 65%);animation-delay:.2s;}
+  .scene__orb--b{width:40vw;height:40vw;bottom:10%;left:-8%;background:radial-gradient(circle,rgba(76,29,149,0.15)0%,transparent 65%);animation-delay:.5s;}
+  .scene__orb--c{width:30vw;height:30vw;top:40%;left:30%;background:radial-gradient(circle,rgba(157,80,255,0.08)0%,transparent 65%);animation-delay:.8s;}
+  @keyframes orbFade{to{opacity:1;}}
+  .site{position:relative;z-index:1;}
+
+  /* ── NAV ── */
+  .nav{position:fixed;top:0;left:72px;right:0;z-index:300;height:48px;padding:0 44px;display:flex;align-items:center;justify-content:flex-start;background:rgba(6,4,15,0.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:background var(--t) var(--ease),box-shadow var(--t) var(--ease);}
+  .nav.is-scrolled{background:rgba(6,4,15,0.95);box-shadow:0 1px 0 var(--border);}
+  .nav__links{display:flex;align-items:center;gap:0;list-style:none;height:100%;}
+  .nav__links a{font-family:var(--f-body);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--t40);text-decoration:none;padding:0 22px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:color var(--t) var(--ease),border-color var(--t) var(--ease);white-space:nowrap;}
+  .nav__links a:hover{color:var(--t0);}
+  .nav__links a.is-active{color:var(--p5);border-bottom-color:var(--p5);}
+  .nav__links a.nav-sleep-stock{color:var(--p5);font-weight:700;}
+
+  /* ── SIDEBAR ── */
+  .sidenav{position:fixed;left:0;top:0;bottom:0;z-index:200;width:72px;display:flex;flex-direction:column;align-items:center;padding:22px 0 26px;border-right:1px solid var(--border);background:rgba(6,4,15,0.80);backdrop-filter:blur(12px);}
+  .sidenav__heading{font-family:var(--f-body);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t40);align-self:flex-start;padding-left:18px;margin-bottom:5px;}
+  .sidenav__heading-line{width:18px;height:1px;background:var(--t20);align-self:flex-start;margin-left:18px;}
+  .sidenav__items{flex:1;width:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:center;position:relative;padding:8px 0 4px;}
+  .sidenav__track{position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);background:linear-gradient(to bottom,transparent 0%,var(--t20)8%,var(--t20)92%,transparent 100%);}
+  .sidenav__item{flex:1;width:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;position:relative;cursor:pointer;z-index:1;}
+  .sidenav__dot-wrap{width:20px;height:20px;display:flex;align-items:center;justify-content:center;}
+  .sidenav__dot{width:5px;height:5px;border-radius:50%;background:transparent;border:1.5px solid var(--t20);transition:all var(--t) var(--spring);}
+  .sidenav__item:hover .sidenav__dot{border-color:var(--p4);background:var(--p2);transform:scale(1.3);}
+  .sidenav__item.is-active .sidenav__dot{background:var(--p4);border-color:var(--p4);width:7px;height:7px;box-shadow:0 0 0 4px rgba(138,56,245,0.25);}
+  .sidenav__num{font-family:var(--f-body);font-size:8px;font-weight:700;letter-spacing:.06em;color:transparent;transition:color var(--t) var(--ease);line-height:1;}
+  .sidenav__item.is-active .sidenav__num{color:var(--p5);}
+  .sidenav__label{display:none;}
+
+  /* ── LOGO (sidebar) ── */
+  .sidenav__logo{margin-bottom:18px;}
+
+  /* ── UTILS ── */
+  .section{padding:96px 0;}
+  .section__inner{max-width:1140px;margin:0 auto;padding:0 44px;}
+  .eyebrow{font-family:var(--f-body);font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--p5);margin-bottom:14px;}
+  .section-title{font-family:var(--f-head);font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-.02em;line-height:1.08;color:var(--t0);margin-bottom:48px;text-align:center;}
+  .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r-f);font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+  .tag--rem{background:rgba(138,56,245,0.2);color:var(--p2);}
+  .tag--live{background:rgba(34,197,94,0.15);color:var(--green);}
+
+  /* ── SR (scroll reveal) ── */
+  .sr{opacity:0;transform:translateY(22px);transition:opacity .55s var(--ease),transform .55s var(--ease);}
+  .sr.is-visible{opacity:1;transform:none;}
+  .sr-d1{transition-delay:.10s;}.sr-d2{transition-delay:.20s;}.sr-d3{transition-delay:.30s;}.sr-d4{transition-delay:.40s;}
+
+  /* ════════════════════════════════════════
+     HERO
+  ════════════════════════════════════════ */
+  .hero{min-height:100vh;display:flex;align-items:center;padding:100px 44px 80px;max-width:1200px;margin:0 auto;gap:60px;}
+  .hero__left{flex:0 0 320px;}
+  .hero__logo-sm{margin-bottom:28px;opacity:.9;}
+  .hero__tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--f-body);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t60);margin-bottom:18px;}
+  .hero__tag::before{content:'';display:block;width:20px;height:1px;background:var(--t40);}
+  .hero__h1{font-family:var(--f-head);font-size:clamp(42px,5vw,64px);font-weight:700;line-height:1.0;letter-spacing:-.03em;color:var(--t0);margin-bottom:22px;}
+  .hero__headline{font-family:var(--f-head);font-size:clamp(20px,2.5vw,28px);font-weight:700;line-height:1.15;letter-spacing:-.02em;color:var(--t0);margin-bottom:14px;}
+  .hero__headline .accent{color:var(--p5);}
+  .hero__body{font-size:14px;line-height:1.7;color:var(--t60);margin-bottom:32px;max-width:340px;}
+  .hero__cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:40px;}
+  .btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--f-body);font-weight:600;text-decoration:none;cursor:pointer;border:none;outline:none;border-radius:var(--r-f);transition:all var(--t) var(--ease);}
+  .btn--primary{background:var(--p4);color:#fff;padding:11px 24px;font-size:13px;box-shadow:var(--glow-s);}
+  .btn--primary:hover{background:var(--p5);box-shadow:var(--glow-m);transform:translateY(-1px);}
+  .btn--ghost{background:transparent;color:var(--t60);padding:11px 0;font-size:13px;border:none;}
+  .btn--ghost:hover{color:var(--t0);}
+  .hero__qr{display:flex;align-items:center;gap:16px;}
+  .hero__qr-box{width:68px;height:68px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--r-m);display:flex;align-items:center;justify-content:center;padding:6px;}
+  .hero__qr-text{font-size:11px;color:var(--t40);line-height:1.5;}
+  .hero__qr-stores{display:flex;gap:8px;margin-top:6px;}
+  .hero__store{font-size:10px;color:var(--t60);display:flex;align-items:center;gap:4px;}
+
+  .hero__right{flex:1;display:flex;flex-direction:column;gap:16px;}
+
+  /* Live reading panel */
+  .live-panel{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--r-l);overflow:hidden;backdrop-filter:blur(8px);}
+  .live-panel__header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+  .live-panel__title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t40);display:flex;align-items:center;gap:8px;}
+  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse-dot 1.5s ease-in-out infinite;}
+  @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.4;}}
+  .live-badge{font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--green);display:flex;align-items:center;gap:5px;}
+  .live-panel__body{display:flex;align-items:stretch;min-height:280px;}
+  .live-panel__viz{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;position:relative;}
+  .live-panel__status{width:200px;border-left:1px solid var(--border);padding:24px 20px;display:flex;flex-direction:column;gap:16px;}
+  .status-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t40);margin-bottom:4px;}
+  .status-value{font-family:var(--f-head);font-size:22px;font-weight:700;color:var(--p5);letter-spacing:-.02em;}
+  .status-row{display:flex;justify-content:space-between;align-items:baseline;}
+  .status-key{font-size:11px;color:var(--t60);}
+  .status-val{font-size:11px;font-weight:600;color:var(--t0);}
+  .status-bar-wrap{height:3px;background:var(--t10);border-radius:2px;margin-top:3px;}
+  .status-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--p4),var(--p5));}
+
+  /* Dreams table */
+  .dreams-table-wrap{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--r-l);overflow:hidden;backdrop-filter:blur(8px);}
+  .dreams-table__header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+  .dreams-table__title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t40);display:flex;align-items:center;gap:8px;}
+  .dreams-table__filter{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--p5);cursor:pointer;display:flex;align-items:center;gap:5px;}
+  .dream-row{display:grid;grid-template-columns:160px 1fr 100px 100px 110px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid rgba(138,56,245,0.07);transition:background var(--t) var(--ease);cursor:pointer;}
+  .dream-row:last-child{border-bottom:none;}
+  .dream-row:hover{background:rgba(138,56,245,0.05);}
+  .dream-img{width:48px;height:36px;border-radius:var(--r-s);object-fit:cover;background:rgba(138,56,245,0.15);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .dream-info{display:flex;align-items:center;gap:12px;}
+  .dream-name{font-size:13px;font-weight:600;color:var(--t0);margin-bottom:3px;}
+  .dream-cat{font-size:10px;color:var(--t40);}
+  .dream-tags{display:flex;gap:5px;margin-top:5px;}
+  .dream-mini-chart{display:flex;align-items:flex-end;gap:2px;height:28px;}
+  .dream-mini-chart span{display:block;width:3px;background:var(--p4);border-radius:1px;opacity:.6;}
+  .dream-stat-col{font-size:11px;color:var(--t60);}
+  .dream-stat-col strong{display:block;font-size:12px;font-weight:600;color:var(--t0);margin-bottom:2px;}
+  .dream-price{font-family:var(--f-mono);font-size:13px;font-weight:600;color:var(--t0);text-align:right;}
+  .dream-change{font-family:var(--f-mono);font-size:11px;font-weight:700;text-align:right;}
+  .dream-change.up{color:var(--green);}
+  .dream-change.down{color:var(--red);}
+  .dreams-table__footer{padding:12px 20px;text-align:center;}
+  .dreams-table__footer a{font-size:11px;font-weight:600;color:var(--p5);text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+  .dreams-table__footer a:hover{color:var(--p6);}
+
+  /* ════════════════════════════════════════
+     STATS
+  ════════════════════════════════════════ */
+  .stats-section{padding:80px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
+  .stat-item{background:var(--bg-0);padding:40px 36px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .stat-icon{width:44px;height:44px;border-radius:var(--r-m);background:rgba(138,56,245,0.12);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--p5);margin-bottom:16px;}
+  .stat-label{font-size:11px;color:var(--t60);margin-bottom:6px;}
+  .stat-number{font-family:var(--f-head);font-size:36px;font-weight:700;color:var(--t0);letter-spacing:-.03em;line-height:1;margin-bottom:6px;}
+  .stat-delta{font-size:11px;font-weight:600;color:var(--green);}
+
+  /* ════════════════════════════════════════
+     CATEGORIAS
+  ════════════════════════════════════════ */
+  .cats-section{padding:96px 0;}
+  .cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:56px;}
+  .cat-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--r-l);overflow:hidden;transition:all var(--t) var(--ease);cursor:pointer;}
+  .cat-card:hover{background:rgba(138,56,245,0.06);border-color:var(--border-h);transform:translateY(-4px);box-shadow:var(--shadow-l);}
+  .cat-card__art{height:220px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+  .cat-card__body{padding:20px;}
+  .cat-card__label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t40);margin-bottom:8px;}
+  .cat-card__name{font-family:var(--f-head);font-size:18px;font-weight:700;color:var(--t0);margin-bottom:10px;}
+  .cat-card__status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t60);margin-bottom:10px;}
+  .cat-card__status-dot{width:7px;height:7px;border-radius:50%;}
+  .cat-card__desc{font-size:12px;line-height:1.65;color:var(--t40);margin-bottom:16px;}
+  .cat-card__link{font-size:11px;font-weight:600;color:var(--p5);text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+  .cat-card__link:hover{color:var(--p6);}
+
+  /* ════════════════════════════════════════
+     FEATURES
+  ════════════════════════════════════════ */
+  .features-section{padding:96px 0;background:rgba(138,56,245,0.03);border-top:1px solid var(--border);}
+  .features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:56px;}
+  .feat{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;}
+  .feat__icon{width:52px;height:52px;border-radius:var(--r-m);background:rgba(138,56,245,0.12);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--p5);}
+  .feat__name{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--t0);}
+  .feat__desc{font-size:12px;line-height:1.7;color:var(--t40);}
+
+  /* ════════════════════════════════════════
+     CTA DOWNLOAD
+  ════════════════════════════════════════ */
+  .cta-section{padding:96px 44px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px;align-items:center;max-width:1140px;margin:0 auto;border-top:1px solid var(--border);}
+  .cta-section__phone{display:flex;align-items:center;justify-content:center;}
+  .phone-mockup{width:160px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:24px;padding:14px;box-shadow:var(--shadow-l);}
+  .phone-screen{background:rgba(138,56,245,0.08);border-radius:16px;height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:1px solid var(--border);}
+  .cta-section__text{text-align:center;}
+  .cta-section__title{font-family:var(--f-head);font-size:clamp(22px,3vw,32px);font-weight:700;line-height:1.15;color:var(--t0);margin-bottom:24px;letter-spacing:-.02em;}
+  .stores-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .store-btn{display:flex;align-items:center;gap:9px;padding:10px 18px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--r-m);text-decoration:none;transition:all var(--t) var(--ease);}
+  .store-btn:hover{background:rgba(255,255,255,0.10);border-color:var(--border-h);}
+  .store-btn__sub{font-size:9px;color:var(--t40);display:block;letter-spacing:.06em;}
+  .store-btn__name{font-size:13px;font-weight:700;color:var(--t0);}
+  .cta-section__qr{display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .cta-qr-box{width:100px;height:100px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--r-m);display:flex;align-items:center;justify-content:center;}
+  .cta-qr-label{font-size:11px;color:var(--t40);text-align:center;}
+
+  /* ── FOOTER ── */
+  .footer{border-top:1px solid var(--border);padding:28px 44px;display:flex;align-items:center;justify-content:space-between;}
+  .footer__logo{opacity:.5;}
+  .footer__links{display:flex;gap:24px;}
+  .footer__links a{font-size:11px;color:var(--t40);text-decoration:none;}
+  .footer__links a:hover{color:var(--t0);}
+  .footer__social{display:flex;gap:16px;}
+  .footer__social a{color:var(--t40);transition:color var(--t) var(--ease);}
+  .footer__social a:hover{color:var(--t0);}
+
+  /* ── WAVEFORM ANIMATION ── */
+  @keyframes wave1{0%,100%{d:path("M0,60 C80,30 160,90 240,50 C320,10 380,70 480,60");}50%{d:path("M0,60 C80,90 160,30 240,70 C320,110 380,40 480,60");}}
+  @keyframes wave2{0%,100%{d:path("M0,60 C60,80 140,40 220,65 C300,90 380,45 480,60");}50%{d:path("M0,60 C60,40 140,80 220,55 C300,30 380,75 480,60");}}
+  @keyframes rotateSlow{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  @keyframes counterRotate{from{transform:rotate(0deg);}to{transform:rotate(-360deg);}}
+
+  /* ── COUNTER ANIMATION ── */
+  .js-counter{font-variant-numeric:tabular-nums;}
+  </style>
+</head>
+<body>
+
+<!-- AMBIENT -->
+<div class="scene" aria-hidden="true">
+  <div class="scene__grid"></div>
+  <div class="scene__orb scene__orb--a"></div>
+  <div class="scene__orb scene__orb--b"></div>
+  <div class="scene__orb scene__orb--c"></div>
+</div>
+
+<div class="site">
+
+  <!-- NAV -->
+  <nav class="nav" id="nav" role="navigation" aria-label="Navegación principal">
+    <ul class="nav__links" role="list">
+      <li><a href="hypn-home.html">Home</a></li>
+      <li><a href="suscripciones.html">Suscripciones</a></li>
+      <li><a href="experiencias.html">Experiencias</a></li>
+      <li><a href="mercado.html">Mercado</a></li>
+      <li><a href="tecnologia.html">Tecnología</a></li>
+      <li><a href="sleep-stock.html" class="nav-sleep-stock is-active">Sleep Stock</a></li>
+    </ul>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <nav class="sidenav" id="sidenav" aria-label="Navegación por secciones">
+    <div class="sidenav__logo">
+      <svg width="20" height="20" viewBox="0 0 283 90" fill="none">
+        <path d="M56 75L55 75C53 75 51 75 49 75V42L7 42L7 75L0 75V2H7L7 36L49 36V2H56L56 75Z" fill="#8A38F5"/>
+      </svg>
+    </div>
+    <span class="sidenav__heading">Nav</span>
+    <span class="sidenav__heading-line"></span>
+    <div class="sidenav__items">
+      <div class="sidenav__track"></div>
+      <a class="sidenav__item is-active" href="#hero" data-section="hero">
+        <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+        <span class="sidenav__num">01</span>
+      </a>
+      <a class="sidenav__item" href="#section-market" data-section="section-market">
+        <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+        <span class="sidenav__num">02</span>
+      </a>
+      <a class="sidenav__item" href="#section-stats" data-section="section-stats">
+        <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+        <span class="sidenav__num">03</span>
+      </a>
+      <a class="sidenav__item" href="#section-cats" data-section="section-cats">
+        <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+        <span class="sidenav__num">04</span>
+      </a>
+      <a class="sidenav__item" href="#section-features" data-section="section-features">
+        <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+        <span class="sidenav__num">05</span>
+      </a>
+      <a class="sidenav__item" href="#section-cta" data-section="section-cta">
+        <div class="sidenav__dot-wrap"><span class="sidenav__dot"></span></div>
+        <span class="sidenav__num">06</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ════════════════ HERO ════════════════ -->
+  <section class="hero" id="hero">
+    <div class="hero__left sr sr-now">
+      <!-- HYPN logo -->
+      <div class="hero__logo-sm">
+        <a href="hypn-home.html" aria-label="Hypn">
+          <svg width="70" height="22" viewBox="0 0 283 90" fill="none">
+            <path d="M56.1506 74.7975L55.5911 74.8965C53.5563 75.2564 51.8824 75.27 50.0009 74.946L49.4414 74.847V42.2286L6.76335 42.2241L6.73176 75.2475L0.0045166 74.9775V2.5195H6.74079L6.78139 35.7903L49.4459 35.7724V2.5195H56.1371L56.1506 74.7975Z" fill="#8A38F5"/>
+            <path d="M283 63.6533H276.571L276.544 25.249L275.786 20.3359C275.118 16.0033 272.844 12.395 269.203 9.89352C264.614 6.74415 258.361 5.71836 252.057 7.08159C245.854 8.42232 241.039 12.404 238.856 18.0009C237.416 21.6947 236.712 25.0195 236.703 28.1599L236.618 63.5498L236.013 63.6128C234.971 63.7208 234.087 63.7747 233.22 63.7747C232.404 63.7747 231.6 63.7253 230.703 63.6308L230.098 63.5678V2.5195H236.591L236.681 9.12418C240.024 5.22796 243.58 2.82994 248.019 1.44871C255.744 -0.962805 263.919 -0.346428 270.452 3.14487C275.889 6.04679 279.666 10.6674 281.376 16.4982C282.463 20.201 282.968 23.2334 282.973 26.0408L283 63.6533Z" fill="#8A38F5"/>
+            <path d="M133.886 2.5195L99.9387 89.6626L92.9452 89.6671L104.324 60.5894L79.3734 2.5195H86.3263L107.695 52.0816L127.042 2.5195H133.886Z" fill="#8A38F5"/>
+            <path d="M178.274 62.398H178.247C177.566 62.461 176.975 62.4925 176.424 62.4925C175.211 62.4925 174.223 62.3351 173.04 61.9886L170.559 61.2598L173.081 60.6839C186.978 57.5075 196.669 45.5849 196.651 31.6872C196.633 17.704 187.271 6.22678 172.801 2.44754L169.065 1.47123L172.91 1.1203C180.526 0.42744 188.038 2.80296 194.052 7.80596C200.414 13.0969 204.484 20.8084 205.215 28.9517C206.704 45.5264 194.869 60.216 178.274 62.398Z" fill="#8A38F5"/>
+            <path d="M155.819 89.3026L155.372 89.4646C154.384 89.8246 153.432 90 152.398 90C151.631 90 150.819 89.901 149.926 89.7031L149.394 89.5906V2.5195H155.814V89.3026H155.819Z" fill="#8A38F5"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="hero__tag">El Mercado de los Sueños en Tiempo Real</div>
+      <h1 class="hero__h1">Sleep Stock</h1>
+      <h2 class="hero__headline">SUEÑOS EN TIEMPO REAL QUE <span class="accent">COTIZAN COMO ACTIVO</span></h2>
+      <p class="hero__body">Observá la actividad onírica anónima en tiempo real y entendé el subconsciente colectivo como un mercado de señales, valor e insight.</p>
+
+      <div class="hero__cta">
+        <a href="#section-market" class="btn btn--primary">
+          Descargar app
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8M3 6l3.5 4L10 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#section-features" class="btn btn--ghost">
+          Ver cómo funciona →
+        </a>
+      </div>
+
+      <div class="hero__qr">
+        <div class="hero__qr-box">
+          <!-- QR code visual -->
+          <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="2" stroke="rgba(138,56,245,0.6)" stroke-width="1.5" fill="none"/>
+            <rect x="6" y="6" width="12" height="12" rx="1" fill="rgba(138,56,245,0.4)"/>
+            <rect x="32" y="2" width="20" height="20" rx="2" stroke="rgba(138,56,245,0.6)" stroke-width="1.5" fill="none"/>
+            <rect x="36" y="6" width="12" height="12" rx="1" fill="rgba(138,56,245,0.4)"/>
+            <rect x="2" y="32" width="20" height="20" rx="2" stroke="rgba(138,56,245,0.6)" stroke-width="1.5" fill="none"/>
+            <rect x="6" y="36" width="12" height="12" rx="1" fill="rgba(138,56,245,0.4)"/>
+            <rect x="32" y="32" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+            <rect x="38" y="32" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+            <rect x="44" y="32" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+            <rect x="32" y="38" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+            <rect x="44" y="38" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+            <rect x="32" y="44" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+            <rect x="38" y="44" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+            <rect x="44" y="44" width="4" height="4" fill="rgba(138,56,245,0.5)"/>
+          </svg>
+        </div>
+        <div>
+          <div class="hero__qr-text">Escaneá para descargar la app</div>
+          <div class="hero__qr-stores">
+            <span class="hero__store">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              iOS
+            </span>
+            <span class="hero__store">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l14 8.5c.6.36.6 1.24 0 1.6l-14 8.5c-.66.5-1.6.03-1.6-.8z"/></svg>
+              Android
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__right sr sr-now sr-d2">
+      <!-- LIVE READING PANEL -->
+      <div class="live-panel">
+        <div class="live-panel__header">
+          <div class="live-panel__title">
+            <span class="live-dot"></span>
+            Lectura Onírica en Vivo
+          </div>
+          <div class="live-badge">
+            <span class="live-dot"></span>
+            En Vivo
+          </div>
+        </div>
+        <div class="live-panel__body">
+          <div class="live-panel__viz">
+            <!-- Animated waveform/orbital viz -->
+            <svg width="280" height="220" viewBox="0 0 280 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Outer ring -->
+              <circle cx="140" cy="110" r="95" stroke="rgba(138,56,245,0.12)" stroke-width="1"/>
+              <circle cx="140" cy="110" r="75" stroke="rgba(138,56,245,0.18)" stroke-width="1" stroke-dasharray="4 6"/>
+              <circle cx="140" cy="110" r="55" stroke="rgba(138,56,245,0.25)" stroke-width="1"/>
+              <!-- Rotating arc -->
+              <g style="transform-origin:140px 110px;animation:rotateSlow 8s linear infinite;">
+                <circle cx="140" cy="15" r="5" fill="var(--p4)" opacity=".9"/>
+                <path d="M140 110 L140 20" stroke="rgba(138,56,245,0.3)" stroke-width="1"/>
+              </g>
+              <g style="transform-origin:140px 110px;animation:counterRotate 12s linear infinite;">
+                <circle cx="235" cy="110" r="4" fill="var(--p5)" opacity=".7"/>
+                <path d="M140 110 L230 110" stroke="rgba(138,56,245,0.2)" stroke-width="1"/>
+              </g>
+              <!-- Central glow -->
+              <circle cx="140" cy="110" r="28" fill="rgba(138,56,245,0.08)"/>
+              <circle cx="140" cy="110" r="18" fill="rgba(138,56,245,0.14)"/>
+              <circle cx="140" cy="110" r="10" fill="rgba(138,56,245,0.30)">
+                <animate attributeName="r" values="8;13;8" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values=".30;.60;.30" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <!-- Waveform lines -->
+              <path d="M45 110 C65 90 85 130 105 100 C125 70 145 140 165 100 C185 60 205 130 235 110" stroke="rgba(138,56,245,0.5)" stroke-width="1.5" fill="none" stroke-linecap="round">
+                <animate attributeName="d" values="M45 110 C65 90 85 130 105 100 C125 70 145 140 165 100 C185 60 205 130 235 110;M45 110 C65 130 85 90 105 120 C125 150 145 80 165 120 C185 150 205 90 235 110;M45 110 C65 90 85 130 105 100 C125 70 145 140 165 100 C185 60 205 130 235 110" dur="3s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+              </path>
+              <path d="M45 118 C75 100 100 136 130 108 C155 84 175 130 210 112 C220 108 228 110 235 112" stroke="rgba(157,80,255,0.3)" stroke-width="1" fill="none" stroke-linecap="round">
+                <animate attributeName="d" values="M45 118 C75 100 100 136 130 108 C155 84 175 130 210 112 C220 108 228 110 235 112;M45 118 C75 136 100 100 130 128 C155 152 175 106 210 124 C220 128 228 126 235 124;M45 118 C75 100 100 136 130 108 C155 84 175 130 210 112 C220 108 228 110 235 112" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+              </path>
+              <!-- Data points -->
+              <circle cx="105" cy="100" r="3" fill="var(--p3)" opacity=".8"/>
+              <circle cx="165" cy="100" r="3" fill="var(--p3)" opacity=".8"/>
+              <!-- Labels -->
+              <text x="50" y="175" fill="rgba(255,255,255,0.25)" font-size="9" font-family="Inter,sans-serif" letter-spacing="0.1em">FRECUENCIA</text>
+              <text x="185" y="175" fill="rgba(255,255,255,0.25)" font-size="9" font-family="Inter,sans-serif" letter-spacing="0.1em">AMPLITUD</text>
+            </svg>
+          </div>
+          <div class="live-panel__status">
+            <div>
+              <div class="status-label">Estado Onírico Actual</div>
+              <div class="status-value">REM PROFUNDO</div>
+            </div>
+            <div>
+              <div class="status-label">Lucidez</div>
+              <div class="status-row"><span class="status-key">Índice</span><span class="status-val">67%</span></div>
+              <div class="status-bar-wrap"><div class="status-bar" style="width:67%;"></div></div>
+            </div>
+            <div>
+              <div class="status-label">Actividad Neural</div>
+              <div class="status-row"><span class="status-key">Nivel</span><span class="status-val">Alta</span></div>
+              <div style="height:28px;margin-top:4px;">
+                <svg width="100%" height="28" viewBox="0 0 160 28" fill="none">
+                  <polyline points="0,14 15,8 30,18 45,6 60,20 75,4 90,22 105,8 120,16 135,5 155,18" stroke="rgba(138,56,245,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <animate attributeName="points" values="0,14 15,8 30,18 45,6 60,20 75,4 90,22 105,8 120,16 135,5 155,18;0,14 15,18 30,8 45,20 60,6 75,22 90,4 105,16 120,8 135,20 155,10;0,14 15,8 30,18 45,6 60,20 75,4 90,22 105,8 120,16 135,5 155,18" dur="2s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+                  </polyline>
+                </svg>
+              </div>
+            </div>
+            <div>
+              <div class="status-label">Señal</div>
+              <div class="status-row"><span class="status-key">Estado</span><span class="status-val" style="color:var(--green);">Estable</span></div>
+            </div>
+            <div>
+              <div class="status-label">Sincronización Global</div>
+              <div class="status-row"><span class="status-key">Red</span><span class="status-val">82%</span></div>
+              <div class="status-bar-wrap"><div class="status-bar" style="width:82%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DREAMS TABLE -->
+      <div class="dreams-table-wrap" id="section-market">
+        <div class="dreams-table__header">
+          <div class="dreams-table__title">
+            <span class="live-dot"></span>
+            Sueños de otras personas · En Tiempo Real
+          </div>
+          <div class="dreams-table__filter">Filtrar ▾</div>
+        </div>
+        <!-- Rows -->
+        <div class="dream-row">
+          <div class="dream-info">
+            <div class="dream-img">
+              <svg width="48" height="36" viewBox="0 0 48 36"><defs><radialGradient id="dg1" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#4c1d95"/><stop offset="100%" stop-color="#1a0a2e"/></radialGradient></defs><rect width="48" height="36" fill="url(#dg1)"/><circle cx="24" cy="18" r="12" fill="rgba(138,56,245,0.3)"/><path d="M14 26 Q24 8 34 26" stroke="rgba(167,139,250,0.6)" stroke-width="1" fill="none"/><circle cx="24" cy="10" r="3" fill="rgba(196,181,253,0.5)"/></svg>
+            </div>
+            <div>
+              <div class="dream-name">Bosque infinito</div>
+              <div class="dream-cat">Paisajes / Exploración</div>
+              <div class="dream-tags"><span class="tag tag--rem">REM</span><span style="font-size:10px;color:var(--t40);">Lucidez 72%</span></div>
+            </div>
+          </div>
+          <div class="dream-mini-chart" id="chart-1"></div>
+          <div class="dream-stat-col"><strong>Alta</strong>Actividad neural</div>
+          <div class="dream-stat-col"><strong>Media</strong>Volatilidad</div>
+          <div>
+            <div class="dream-price" id="price-1">$ 1,824.50</div>
+            <div class="dream-change up" id="delta-1">▲ 3.12%</div>
+          </div>
+        </div>
+        <div class="dream-row">
+          <div class="dream-info">
+            <div class="dream-img">
+              <svg width="48" height="36" viewBox="0 0 48 36"><defs><radialGradient id="dg2" cx="50%" cy="60%" r="70%"><stop offset="0%" stop-color="#2d1b69"/><stop offset="100%" stop-color="#0d0520"/></radialGradient></defs><rect width="48" height="36" fill="url(#dg2)"/><line x1="24" y1="4" x2="24" y2="32" stroke="rgba(196,181,253,0.4)" stroke-width="1"/><circle cx="24" cy="10" r="5" fill="rgba(138,56,245,0.5)"/><circle cx="24" cy="22" r="3" fill="rgba(138,56,245,0.3)"/></svg>
+            </div>
+            <div>
+              <div class="dream-name">Caída lenta</div>
+              <div class="dream-cat">Caídas / Sensación</div>
+              <div class="dream-tags"><span class="tag tag--rem">REM</span><span style="font-size:10px;color:var(--t40);">Lucidez 41%</span></div>
+            </div>
+          </div>
+          <div class="dream-mini-chart" id="chart-2"></div>
+          <div class="dream-stat-col"><strong>Muy alta</strong>Actividad neural</div>
+          <div class="dream-stat-col"><strong>Alta</strong>Volatilidad</div>
+          <div>
+            <div class="dream-price" id="price-2">$ 2,348.30</div>
+            <div class="dream-change up" id="delta-2">▲ 6.47%</div>
+          </div>
+        </div>
+        <div class="dream-row">
+          <div class="dream-info">
+            <div class="dream-img">
+              <svg width="48" height="36" viewBox="0 0 48 36"><defs><radialGradient id="dg3" cx="40%" cy="40%" r="65%"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#060415"/></radialGradient></defs><rect width="48" height="36" fill="url(#dg3)"/><ellipse cx="24" cy="22" rx="16" ry="10" fill="rgba(59,130,246,0.2)"/><circle cx="24" cy="16" r="7" fill="rgba(138,56,245,0.25)"/><path d="M16 22 Q24 14 32 22" stroke="rgba(147,197,253,0.4)" stroke-width="1" fill="none"/></svg>
+            </div>
+            <div>
+              <div class="dream-name">Casa sumergida</div>
+              <div class="dream-cat">Agua / Hogar</div>
+              <div class="dream-tags"><span class="tag tag--rem">REM</span><span style="font-size:10px;color:var(--t40);">Lucidez 58%</span></div>
+            </div>
+          </div>
+          <div class="dream-mini-chart" id="chart-3"></div>
+          <div class="dream-stat-col"><strong>Media</strong>Actividad neural</div>
+          <div class="dream-stat-col"><strong>Media</strong>Volatilidad</div>
+          <div>
+            <div class="dream-price" id="price-3">$ 1,203.00</div>
+            <div class="dream-change down" id="delta-3">▼ 1.18%</div>
+          </div>
+        </div>
+        <div class="dream-row">
+          <div class="dream-info">
+            <div class="dream-img">
+              <svg width="48" height="36" viewBox="0 0 48 36"><defs><radialGradient id="dg4" cx="50%" cy="30%" r="65%"><stop offset="0%" stop-color="#3b2070"/><stop offset="100%" stop-color="#0a0415"/></radialGradient></defs><rect width="48" height="36" fill="url(#dg4)"/><polygon points="24,4 30,18 24,32 18,18" fill="rgba(138,56,245,0.25)" stroke="rgba(196,181,253,0.4)" stroke-width="1"/><circle cx="24" cy="18" r="4" fill="rgba(167,139,250,0.6)"/></svg>
+            </div>
+            <div>
+              <div class="dream-name">Cima desconocida</div>
+              <div class="dream-cat">Montañas / Logro</div>
+              <div class="dream-tags"><span class="tag tag--rem">REM</span><span style="font-size:10px;color:var(--t40);">Lucidez 63%</span></div>
+            </div>
+          </div>
+          <div class="dream-mini-chart" id="chart-4"></div>
+          <div class="dream-stat-col"><strong>Alta</strong>Actividad neural</div>
+          <div class="dream-stat-col"><strong>Media</strong>Volatilidad</div>
+          <div>
+            <div class="dream-price" id="price-4">$ 2,015.20</div>
+            <div class="dream-change up" id="delta-4">▲ 2.93%</div>
+          </div>
+        </div>
+        <div class="dreams-table__footer">
+          <a href="#">Ver más sueños en el mercado →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ STATS ════════════════ -->
+  <section class="stats-section" id="section-stats">
+    <div class="section__inner">
+      <p class="eyebrow" style="text-align:center;margin-bottom:12px;">Tu Inconsciente, Nuestro Mercado</p>
+      <div class="stats-grid">
+        <div class="stat-item sr">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="stat-label">Usuarios activos</div>
+          <div class="stat-number js-counter" data-target="128204">0</div>
+          <div class="stat-delta">+12.8% esta semana</div>
+        </div>
+        <div class="stat-item sr sr-d1">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="stat-label">Sueños indexados</div>
+          <div class="stat-number js-counter" data-target="1653485">0</div>
+          <div class="stat-delta">+10.6% esta semana</div>
+        </div>
+        <div class="stat-item sr sr-d2">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="stat-label">Volumen onírico</div>
+          <div class="stat-number">2.4T USD</div>
+          <div class="stat-delta">+9.3% esta semana</div>
+        </div>
+        <div class="stat-item sr sr-d3">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <div class="stat-label">Señales REM por minuto</div>
+          <div class="stat-number js-counter" data-target="84320">0</div>
+          <div class="stat-delta">+15.2% esta semana</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ CATEGORÍAS ════════════════ -->
+  <section class="cats-section" id="section-cats">
+    <div class="section__inner">
+      <p class="eyebrow" style="text-align:center;">Señales del Mercado</p>
+      <h2 class="section-title sr">SUEÑOS QUE MUEVEN EL MERCADO</h2>
+      <div class="cats-grid">
+
+        <!-- CREATIVIDAD -->
+        <div class="cat-card sr sr-d1">
+          <div class="cat-card__art" style="background:radial-gradient(ellipse at 50% 80%, rgba(138,56,245,0.25) 0%, transparent 70%), #0d0820;">
+            <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+              <defs>
+                <radialGradient id="lotusGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#9d50ff" stop-opacity=".9"/><stop offset="60%" stop-color="#6d28d9" stop-opacity=".5"/><stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/></radialGradient>
+                <radialGradient id="petalGrad" cx="50%" cy="0%" r="100%"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="50%" stop-color="#8A38F5"/><stop offset="100%" stop-color="#4c1d95"/></radialGradient>
+              </defs>
+              <!-- Glow base -->
+              <circle cx="80" cy="90" r="50" fill="url(#lotusGlow)" opacity=".5"/>
+              <!-- Lotus petals -->
+              <g transform="translate(80,90)">
+                <!-- Center -->
+                <ellipse rx="12" ry="18" fill="url(#petalGrad)" opacity=".95"/>
+                <!-- Petal ring 1 -->
+                <g transform="rotate(0)"><ellipse ry="26" rx="9" cy="-22" fill="url(#petalGrad)" opacity=".85"/></g>
+                <g transform="rotate(45)"><ellipse ry="22" rx="7" cy="-20" fill="url(#petalGrad)" opacity=".75"/></g>
+                <g transform="rotate(90)"><ellipse ry="26" rx="9" cy="-22" fill="url(#petalGrad)" opacity=".85"/></g>
+                <g transform="rotate(135)"><ellipse ry="22" rx="7" cy="-20" fill="url(#petalGrad)" opacity=".75"/></g>
+                <g transform="rotate(180)"><ellipse ry="26" rx="9" cy="-22" fill="url(#petalGrad)" opacity=".85"/></g>
+                <g transform="rotate(225)"><ellipse ry="22" rx="7" cy="-20" fill="url(#petalGrad)" opacity=".75"/></g>
+                <g transform="rotate(270)"><ellipse ry="26" rx="9" cy="-22" fill="url(#petalGrad)" opacity=".85"/></g>
+                <g transform="rotate(315)"><ellipse ry="22" rx="7" cy="-20" fill="url(#petalGrad)" opacity=".75"/></g>
+                <!-- Outer petals -->
+                <g transform="rotate(22.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <g transform="rotate(67.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <g transform="rotate(112.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <g transform="rotate(157.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <g transform="rotate(202.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <g transform="rotate(247.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <g transform="rotate(292.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <g transform="rotate(337.5)"><ellipse ry="18" rx="6" cy="-38" fill="#8A38F5" opacity=".45"/></g>
+                <!-- Core -->
+                <circle r="8" fill="#c4b5fd"/>
+                <circle r="4" fill="white" opacity=".9"/>
+              </g>
+              <!-- Reflection -->
+              <ellipse cx="80" cy="135" rx="35" ry="8" fill="rgba(138,56,245,0.15)"/>
+            </svg>
+          </div>
+          <div class="cat-card__body">
+            <div class="cat-card__label">Creatividad</div>
+            <div class="cat-card__name">Creatividad</div>
+            <div class="cat-card__status">
+              <span class="cat-card__status-dot" style="background:var(--green);box-shadow:0 0 6px var(--green);"></span>
+              Tendencia alcista ↑
+            </div>
+            <div class="cat-card__desc">Patrones asociados a ideas innovadoras y soluciones.</div>
+            <a href="#" class="cat-card__link">Ver señales →</a>
+          </div>
+        </div>
+
+        <!-- MEMORIA -->
+        <div class="cat-card sr sr-d2">
+          <div class="cat-card__art" style="background:radial-gradient(ellipse at 50% 50%, rgba(99,60,180,0.3) 0%, transparent 70%), #0a0820;">
+            <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+              <defs>
+                <linearGradient id="cubeTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#6d28d9"/></linearGradient>
+                <linearGradient id="cubeLeft" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4c1d95"/><stop offset="100%" stop-color="#8A38F5"/></linearGradient>
+                <linearGradient id="cubeRight" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#2d1b69"/></linearGradient>
+              </defs>
+              <g transform="translate(80,80) rotate(15)">
+                <!-- Main cube -->
+                <!-- Top face -->
+                <polygon points="0,-40 34,-20 0,0 -34,-20" fill="url(#cubeTop)" opacity=".9"/>
+                <!-- Left face -->
+                <polygon points="-34,-20 0,0 0,40 -34,20" fill="url(#cubeLeft)" opacity=".8"/>
+                <!-- Right face -->
+                <polygon points="34,-20 0,0 0,40 34,20" fill="url(#cubeRight)" opacity=".85"/>
+                <!-- Edges highlight -->
+                <polyline points="0,-40 34,-20 34,20 0,40 -34,20 -34,-20 0,-40" stroke="rgba(196,181,253,0.3)" stroke-width="0.5" fill="none"/>
+                <line x1="0" y1="-40" x2="0" y2="0" stroke="rgba(196,181,253,0.4)" stroke-width="0.5"/>
+                <line x1="34" y1="-20" x2="0" y2="0" stroke="rgba(196,181,253,0.3)" stroke-width="0.5"/>
+                <line x1="-34" y1="-20" x2="0" y2="0" stroke="rgba(196,181,253,0.3)" stroke-width="0.5"/>
+                <!-- Inner small cubes (memory effect) -->
+                <g transform="translate(-17,-10) scale(0.4)" opacity=".5">
+                  <polygon points="0,-40 34,-20 0,0 -34,-20" fill="#c4b5fd"/>
+                  <polygon points="-34,-20 0,0 0,40 -34,20" fill="#6d28d9"/>
+                  <polygon points="34,-20 0,0 0,40 34,20" fill="#8A38F5"/>
+                </g>
+                <g transform="translate(17,-10) scale(0.4)" opacity=".5">
+                  <polygon points="0,-40 34,-20 0,0 -34,-20" fill="#c4b5fd"/>
+                  <polygon points="-34,-20 0,0 0,40 -34,20" fill="#6d28d9"/>
+                  <polygon points="34,-20 0,0 0,40 34,20" fill="#8A38F5"/>
+                </g>
+                <g transform="translate(0,14) scale(0.4)" opacity=".5">
+                  <polygon points="0,-40 34,-20 0,0 -34,-20" fill="#c4b5fd"/>
+                  <polygon points="-34,-20 0,0 0,40 -34,20" fill="#6d28d9"/>
+                  <polygon points="34,-20 0,0 0,40 34,20" fill="#8A38F5"/>
+                </g>
+              </g>
+              <!-- Glow -->
+              <circle cx="80" cy="80" r="55" fill="rgba(138,56,245,0.08)" style="filter:blur(10px);"/>
+            </svg>
+          </div>
+          <div class="cat-card__body">
+            <div class="cat-card__label">Memoria</div>
+            <div class="cat-card__name">Memoria</div>
+            <div class="cat-card__status">
+              <span class="cat-card__status-dot" style="background:var(--green);box-shadow:0 0 6px var(--green);"></span>
+              Alta actividad
+            </div>
+            <div class="cat-card__desc">Sueños vinculados a recuerdos, símbolos y archivo emocional.</div>
+            <a href="#" class="cat-card__link">Ver señales →</a>
+          </div>
+        </div>
+
+        <!-- ANSIEDAD -->
+        <div class="cat-card sr sr-d3">
+          <div class="cat-card__art" style="background:radial-gradient(ellipse at 50% 50%, rgba(180,50,100,0.15) 0%, transparent 70%), #0a0820;">
+            <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+              <defs>
+                <radialGradient id="spikeGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#9d50ff" stop-opacity=".6"/><stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/></radialGradient>
+              </defs>
+              <circle cx="80" cy="80" r="48" fill="url(#spikeGlow)"/>
+              <circle cx="80" cy="80" r="36" fill="rgba(138,56,245,0.18)" stroke="rgba(196,181,253,0.2)" stroke-width="1"/>
+              <g transform="translate(80,80)">
+                <!-- Spikes all around -->
+                <g transform="rotate(0)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(15)"><line x1="0" y1="-36" x2="0" y2="-48" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(30)"><line x1="0" y1="-36" x2="0" y2="-58" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(45)"><line x1="0" y1="-36" x2="0" y2="-50" stroke="rgba(196,181,253,0.5)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(60)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(75)"><line x1="0" y1="-36" x2="0" y2="-46" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(90)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(105)"><line x1="0" y1="-36" x2="0" y2="-48" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(120)"><line x1="0" y1="-36" x2="0" y2="-58" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(135)"><line x1="0" y1="-36" x2="0" y2="-50" stroke="rgba(196,181,253,0.5)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(150)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(165)"><line x1="0" y1="-36" x2="0" y2="-46" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(180)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(195)"><line x1="0" y1="-36" x2="0" y2="-48" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(210)"><line x1="0" y1="-36" x2="0" y2="-58" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(225)"><line x1="0" y1="-36" x2="0" y2="-50" stroke="rgba(196,181,253,0.5)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(240)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(255)"><line x1="0" y1="-36" x2="0" y2="-46" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(270)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(285)"><line x1="0" y1="-36" x2="0" y2="-48" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(300)"><line x1="0" y1="-36" x2="0" y2="-58" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(315)"><line x1="0" y1="-36" x2="0" y2="-50" stroke="rgba(196,181,253,0.5)" stroke-width="1" stroke-linecap="round"/></g>
+                <g transform="rotate(330)"><line x1="0" y1="-36" x2="0" y2="-56" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" stroke-linecap="round"/></g>
+                <g transform="rotate(345)"><line x1="0" y1="-36" x2="0" y2="-46" stroke="rgba(196,181,253,0.4)" stroke-width="1" stroke-linecap="round"/></g>
+                <!-- Core -->
+                <circle r="14" fill="rgba(138,56,245,0.4)"/>
+                <circle r="8" fill="rgba(196,181,253,0.6)"/>
+                <circle r="4" fill="white" opacity=".8"/>
+              </g>
+            </svg>
+          </div>
+          <div class="cat-card__body">
+            <div class="cat-card__label">Ansiedad</div>
+            <div class="cat-card__name">Ansiedad</div>
+            <div class="cat-card__status">
+              <span class="cat-card__status-dot" style="background:var(--red);box-shadow:0 0 6px var(--red);"></span>
+              REM intenso
+            </div>
+            <div class="cat-card__desc">Señales de estrés y procesamiento emocional profundo.</div>
+            <a href="#" class="cat-card__link">Ver señales →</a>
+          </div>
+        </div>
+
+        <!-- PROFUNDIZACIÓN -->
+        <div class="cat-card sr sr-d4">
+          <div class="cat-card__art" style="background:radial-gradient(ellipse at 50% 50%, rgba(138,56,245,0.2) 0%, transparent 70%), #060412;">
+            <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+              <defs>
+                <radialGradient id="vortexCore" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#9d50ff" stop-opacity=".9"/><stop offset="40%" stop-color="#6d28d9" stop-opacity=".5"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+              </defs>
+              <g transform="translate(80,80)" style="animation:rotateSlow 20s linear infinite;transform-origin:0px 0px;">
+                <ellipse rx="70" ry="20" stroke="rgba(138,56,245,0.4)" stroke-width="1.5" fill="none"/>
+              </g>
+              <g transform="translate(80,80)" style="animation:rotateSlow 15s linear infinite;transform-origin:0px 0px;">
+                <ellipse rx="55" ry="15" stroke="rgba(157,80,255,0.5)" stroke-width="1.5" fill="none"/>
+              </g>
+              <g transform="translate(80,80)" style="animation:counterRotate 12s linear infinite;transform-origin:0px 0px;">
+                <ellipse rx="40" ry="12" stroke="rgba(196,181,253,0.55)" stroke-width="1.5" fill="none"/>
+              </g>
+              <g transform="translate(80,80)" style="animation:counterRotate 8s linear infinite;transform-origin:0px 0px;">
+                <ellipse rx="26" ry="8" stroke="rgba(196,181,253,0.7)" stroke-width="1.5" fill="none"/>
+              </g>
+              <!-- Core -->
+              <circle cx="80" cy="80" r="18" fill="url(#vortexCore)"/>
+              <circle cx="80" cy="80" r="10" fill="rgba(196,181,253,0.5)"/>
+              <circle cx="80" cy="80" r="5" fill="white" opacity=".9"/>
+              <!-- Glow ring -->
+              <circle cx="80" cy="80" r="22" fill="none" stroke="rgba(138,56,245,0.3)" stroke-width="4" style="filter:blur(4px);"/>
+            </svg>
+          </div>
+          <div class="cat-card__body">
+            <div class="cat-card__label">Profundización</div>
+            <div class="cat-card__name">Profundización</div>
+            <div class="cat-card__status">
+              <span class="cat-card__status-dot" style="background:#f59e0b;box-shadow:0 0 6px #f59e0b;"></span>
+              Volatilidad alta
+            </div>
+            <div class="cat-card__desc">Sueños complejos con alto potencial de insight transformador.</div>
+            <a href="#" class="cat-card__link">Ver señales →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ FEATURES ════════════════ -->
+  <section class="features-section" id="section-features">
+    <div class="section__inner">
+      <p class="eyebrow" style="text-align:center;">Tu App para entender lo que soñás (y lo que todos soñamos)</p>
+      <div class="features-grid">
+        <div class="feat sr sr-d1">
+          <div class="feat__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="feat__name">Lectura onírica en vivo</div>
+          <div class="feat__desc">Monitoreo continuo de señales REM y actividad neural global.</div>
+        </div>
+        <div class="feat sr sr-d2">
+          <div class="feat__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <div class="feat__name">Mercado del subconsciente</div>
+          <div class="feat__desc">Cotizá y seguí sueños como activos según su demanda y relevancia.</div>
+        </div>
+        <div class="feat sr sr-d3">
+          <div class="feat__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </div>
+          <div class="feat__name">Alertas personalizadas</div>
+          <div class="feat__desc">Recibí notificaciones sobre sueños clave y tendencias.</div>
+        </div>
+        <div class="feat sr sr-d4">
+          <div class="feat__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="feat__name">Visualización del valor</div>
+          <div class="feat__desc">Analizá métricas, evolución y oportunidades onírica.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ CTA DOWNLOAD ════════════════ -->
+  <section id="section-cta">
+    <div class="cta-section">
+      <!-- Phone mockup -->
+      <div class="cta-section__phone sr">
+        <div class="phone-mockup">
+          <div class="phone-screen">
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+              <path d="M30 5L55 47H5L30 5Z" fill="rgba(138,56,245,0.3)" stroke="rgba(196,181,253,0.5)" stroke-width="1"/>
+              <circle cx="30" cy="32" r="8" fill="rgba(138,56,245,0.5)"/>
+            </svg>
+            <div style="font-size:10px;color:var(--t40);text-align:center;padding:0 10px;">Sleep Stock<br><span style="font-family:var(--f-mono);color:var(--p5);font-size:12px;">2.4T USD</span></div>
+            <div style="font-size:9px;color:var(--green);">▲ +9.3%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text + stores -->
+      <div class="cta-section__text sr sr-d1">
+        <h2 class="cta-section__title">DESCARGÁ SLEEP STOCK Y EXPLORÁ EL MERCADO DEL INCONSCIENTE</h2>
+        <div class="stores-row">
+          <a href="#" class="store-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <div><span class="store-btn__sub">Conseguilo en el</span><span class="store-btn__name">App Store</span></div>
+          </a>
+          <a href="#" class="store-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l14 8.5c.6.36.6 1.24 0 1.6l-14 8.5c-.66.5-1.6.03-1.6-.8z"/></svg>
+            <div><span class="store-btn__sub">Disponible en</span><span class="store-btn__name">Google Play</span></div>
+          </a>
+        </div>
+      </div>
+
+      <!-- QR -->
+      <div class="cta-section__qr sr sr-d2">
+        <div class="cta-qr-box">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <rect x="3" y="3" width="30" height="30" rx="3" stroke="rgba(138,56,245,0.6)" stroke-width="1.5" fill="none"/>
+            <rect x="9" y="9" width="18" height="18" rx="2" fill="rgba(138,56,245,0.35)"/>
+            <rect x="47" y="3" width="30" height="30" rx="3" stroke="rgba(138,56,245,0.6)" stroke-width="1.5" fill="none"/>
+            <rect x="53" y="9" width="18" height="18" rx="2" fill="rgba(138,56,245,0.35)"/>
+            <rect x="3" y="47" width="30" height="30" rx="3" stroke="rgba(138,56,245,0.6)" stroke-width="1.5" fill="none"/>
+            <rect x="9" y="53" width="18" height="18" rx="2" fill="rgba(138,56,245,0.35)"/>
+            <rect x="47" y="47" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+            <rect x="55" y="47" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+            <rect x="63" y="47" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+            <rect x="47" y="55" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+            <rect x="63" y="55" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+            <rect x="47" y="63" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+            <rect x="55" y="63" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+            <rect x="63" y="63" width="6" height="6" fill="rgba(138,56,245,0.5)"/>
+          </svg>
+        </div>
+        <div class="cta-qr-label">Escaneá para descargar la app</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__logo">
+      <svg width="50" height="16" viewBox="0 0 283 90" fill="none">
+        <path d="M56.15 74.8L55.59 74.9C53.56 75.26 51.88 75.27 50 74.95L49.44 74.85V42.23L6.76 42.22L6.73 75.25L0 74.98V2.52H6.74L6.78 35.79L49.45 35.77V2.52H56.14L56.15 74.8Z" fill="#8A38F5"/>
+        <path d="M283 63.65H276.57L276.54 25.25L275.79 20.34C275.12 16 272.84 12.4 269.2 9.89C264.61 6.74 258.36 5.72 252.06 7.08C245.85 8.42 241.04 12.4 238.86 18C237.42 21.69 236.71 25.02 236.7 28.16L236.62 63.55L236.01 63.61C234.97 63.72 234.09 63.77 233.22 63.77C232.4 63.77 231.6 63.73 230.7 63.63L230.1 63.57V2.52H236.59L236.68 9.12C240.02 5.23 243.58 2.83 248.02 1.45C255.74-.96 263.92-.35 270.45 3.14C275.89 6.05 279.67 10.67 281.38 16.5C282.46 20.2 282.97 23.23 282.97 26.04L283 63.65Z" fill="#8A38F5"/>
+        <path d="M133.89 2.52L99.94 89.66L92.95 89.67L104.32 60.59L79.37 2.52H86.33L107.7 52.08L127.04 2.52H133.89Z" fill="#8A38F5"/>
+        <path d="M178.27 62.4H178.25C177.57 62.46 176.98 62.49 176.42 62.49C175.21 62.49 174.22 62.34 173.04 61.99L170.56 61.26L173.08 60.68C186.98 57.51 196.67 45.58 196.65 31.69C196.63 17.7 187.27 6.23 172.8 2.45L169.07 1.47L172.91 1.12C180.53.43 188.04 2.8 194.05 7.81C200.41 13.1 204.48 20.81 205.22 28.95C206.7 45.53 194.87 60.22 178.27 62.4Z" fill="#8A38F5"/>
+        <path d="M155.82 89.3L155.37 89.46C154.38 89.82 153.43 90 152.4 90C151.63 90 150.82 89.9 149.93 89.7L149.39 89.59V2.52H155.81V89.3H155.82Z" fill="#8A38F5"/>
+      </svg>
+    </div>
+    <div class="footer__links">
+      <a href="#">Sobre HYPN</a>
+      <a href="#">Privacidad</a>
+      <a href="#">Términos</a>
+      <a href="#">Ayuda</a>
+      <a href="#">Contacto</a>
+    </div>
+    <div class="footer__social">
+      <a href="#" aria-label="Instagram">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" aria-label="Twitter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="#" aria-label="TikTok">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.73a8.16 8.16 0 004.77 1.52V6.8a4.86 4.86 0 01-1-.11z"/></svg>
+      </a>
+    </div>
+  </footer>
+
+</div><!-- /site -->
+
+<script>
+/* ── NAV SCROLL ── */
+var nav = document.getElementById('nav');
+window.addEventListener('scroll', function() {
+  nav.classList.toggle('is-scrolled', window.scrollY > 30);
+}, {passive:true});
+
+/* ── SCROLL REVEAL ── */
+var srEls = document.querySelectorAll('.sr');
+var io = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+  });
+}, {threshold:0.12});
+srEls.forEach(function(el) { io.observe(el); });
+
+/* ── SIDEBAR ACTIVE ── */
+var sideNavIds = ['hero','section-market','section-stats','section-cats','section-features','section-cta'];
+var sections = sideNavIds.map(function(id){ return document.getElementById(id); }).filter(Boolean);
+var sideItems = document.querySelectorAll('.sidenav__item[data-section]');
+
+function getAbsTop(el) {
+  var r = el.getBoundingClientRect();
+  return r.top + window.pageYOffset;
+}
+
+function updateSidenavStock() {
+  var trigger = window.pageYOffset + window.innerHeight * 0.4;
+  var activeId = sections.length ? sections[0].id : '';
+  sections.forEach(function(s) {
+    if (getAbsTop(s) - 80 <= trigger) activeId = s.id;
+  });
+  sideItems.forEach(function(item) {
+    item.classList.toggle('is-active', item.getAttribute('data-section') === activeId);
+  });
+}
+
+sideItems.forEach(function(item) {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    var targetId = this.getAttribute('data-section');
+    var target = document.getElementById(targetId);
+    if (target) {
+      var top = getAbsTop(target) - 80;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+  });
+});
+
+window.addEventListener('scroll', updateSidenavStock, { passive: true });
+updateSidenavStock();
+
+/* ── COUNTERS ── */
+function animateCounter(el) {
+  var target = parseInt(el.getAttribute('data-target'));
+  var start = 0; var duration = 1800;
+  var startTime = null;
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var prog = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - prog, 3);
+    el.textContent = Math.floor(eased * target).toLocaleString('es-AR');
+    if (prog < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+var cio = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { animateCounter(e.target); cio.unobserve(e.target); }
+  });
+}, {threshold:0.5});
+document.querySelectorAll('.js-counter').forEach(function(el) { cio.observe(el); });
+
+/* ── MINI CHARTS ── */
+function buildMiniChart(containerId, values, isUp) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  var max = Math.max.apply(null, values);
+  var min = Math.min.apply(null, values);
+  var h = 28; var w = 3; var gap = 2;
+  values.forEach(function(v) {
+    var bar = document.createElement('span');
+    var pct = max === min ? 0.5 : (v - min) / (max - min);
+    bar.style.height = Math.max(4, Math.round(pct * h)) + 'px';
+    bar.style.background = isUp ? 'rgba(34,197,94,0.7)' : 'rgba(248,113,113,0.7)';
+    el.appendChild(bar);
+  });
+}
+buildMiniChart('chart-1', [40,55,48,70,62,80,74,90,85,95], true);
+buildMiniChart('chart-2', [60,80,72,95,88,100,92,110,105,120], true);
+buildMiniChart('chart-3', [70,65,72,60,68,55,62,58,60,56], false);
+buildMiniChart('chart-4', [50,60,55,72,68,80,75,88,82,90], true);
+
+/* ── LIVE PRICE UPDATES ── */
+var prices = {
+  'price-1': 1824.50, 'price-2': 2348.30, 'price-3': 1203.00, 'price-4': 2015.20
+};
+var deltas = {
+  'price-1': {el:'delta-1', base:3.12, up:true},
+  'price-2': {el:'delta-2', base:6.47, up:true},
+  'price-3': {el:'delta-3', base:-1.18, up:false},
+  'price-4': {el:'delta-4', base:2.93, up:true}
+};
+document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){document.documentElement.classList.add('page-ready');},20);});
+setInterval(function() {
+  Object.keys(prices).forEach(function(id) {
+    var change = (Math.random() - 0.48) * 8;
+    prices[id] = Math.max(100, prices[id] + change);
+    var el = document.getElementById(id);
+    if (el) el.textContent = '$ ' + prices[id].toLocaleString('es-AR', {minimumFractionDigits:2,maximumFractionDigits:2});
+    var d = deltas[id];
+    var newDelta = d.base + (Math.random() - 0.5) * 0.4;
+    var dEl = document.getElementById(d.el);
+    if (dEl) {
+      var up = newDelta >= 0;
+      dEl.textContent = (up ? '▲ ' : '▼ ') + Math.abs(newDelta).toFixed(2) + '%';
+      dEl.className = 'dream-change ' + (up ? 'up' : 'down');
+    }
+  });
+}, 2200);
+</script>
+
+<!-- FLOATING CTA BUTTON -->
+<style>
+.float-ia {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: linear-gradient(135deg, #8A38F5 0%, #b96fff 100%);
+  border-radius: 100px;
+  text-decoration: none;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 0 0 0 rgba(138,56,245,0.5), 0 8px 32px rgba(138,56,245,0.45);
+  animation: floatPulse 2.5s ease-in-out infinite;
+  transition: transform .2s ease, box-shadow .2s ease;
+  letter-spacing: -.01em;
+}
+.float-ia:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 0 0 8px rgba(138,56,245,0.15), 0 12px 40px rgba(138,56,245,0.6);
+  animation: none;
+}
+.float-ia__icon {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.float-ia__live {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: blink-fa 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes floatPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(138,56,245,.5), 0 8px 32px rgba(138,56,245,.45); }
+  50%      { box-shadow: 0 0 0 10px rgba(138,56,245,.0), 0 8px 32px rgba(138,56,245,.45); }
+}
+@keyframes blink-fa { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+</style>
+
+<!-- ══════════════════════════════════════
+     SUEÑOS EN VIVO — TAB BUTTON + PANEL
+════════════════════════════════════════ -->
+<style>
+/* ─── TAB BUTTON (fixed top-right) ─── */
+#live-tab-btn {
+  position: fixed;
+  top: 18px;
+  right: 28px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg,rgba(138,56,245,.4),rgba(185,111,255,.25));
+  border: 1px solid rgba(138,56,245,.6);
+  border-radius: 100px;
+  color: #c4b5fd;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(138,56,245,.25);
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+}
+#live-tab-btn:hover, #live-tab-btn.active {
+  background: linear-gradient(135deg,rgba(138,56,245,.65),rgba(185,111,255,.45));
+  border-color: rgba(185,111,255,.85);
+  color: #fff;
+  box-shadow: 0 6px 28px rgba(138,56,245,.45);
+}
+#live-tab-btn .ltb-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e; box-shadow: 0 0 6px #22c55e;
+  animation: ltb-blink 1.5s ease-in-out infinite;
+}
+@keyframes ltb-blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+/* ─── LIVE PANEL (full-page overlay) ─── */
+#live-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(6,4,15,.97);
+  display: none;
+  flex-direction: column;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow: hidden;
+}
+#live-panel.open { display: flex; animation: lp-in .35s cubic-bezier(.4,0,.2,1); }
+@keyframes lp-in { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:none;} }
+
+/* Ambient glow */
+#live-panel::before {
+  content:'';
+  position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(ellipse at 60% 30%, rgba(138,56,245,.12) 0%, transparent 60%);
+}
+
+/* Header */
+.lp-header {
+  height: 60px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(138,56,245,.18);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 32px;
+  background: rgba(138,56,245,.04);
+  position: relative; z-index: 1;
+}
+.lp-header__title {
+  font-size: 13px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; gap: 10px;
+}
+.lp-header__sub { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+.lp-header__live { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #22c55e; }
+.lp-header__live span { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: ltb-blink 1.5s ease-in-out infinite; }
+.lp-close {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.5); cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.lp-close:hover { background: rgba(255,0,80,.2); color: #fff; border-color: rgba(255,0,80,.3); }
+
+/* Grid layout */
+.lp-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 0;
+  min-height: 0;
+  position: relative; z-index: 1;
+}
+
+/* Left: stream */
+.lp-stream {
+  border-right: 1px solid rgba(138,56,245,.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.lp-stream__header {
+  padding: 20px 28px 14px;
+  border-bottom: 1px solid rgba(138,56,245,.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lp-stream__label {
+  font-size: 9px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: rgba(255,255,255,.5);
+}
+.lp-stream__count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600; color: rgba(138,56,245,.8);
+}
+.lp-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lp-feed::-webkit-scrollbar { width: 2px; }
+.lp-feed::-webkit-scrollbar-thumb { background: #8A38F5; border-radius: 2px; }
+
+/* Dream card in feed */
+.lp-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(138,56,245,.14);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  animation: lc-in .4s cubic-bezier(.4,0,.2,1);
+  transition: border-color .2s, background .2s;
+  cursor: default;
+}
+.lp-card:hover {
+  border-color: rgba(138,56,245,.35);
+  background: rgba(138,56,245,.06);
+}
+.lp-card.new {
+  border-color: rgba(138,56,245,.5);
+  background: rgba(138,56,245,.1);
+  animation: lc-new .5s cubic-bezier(.4,0,.2,1);
+}
+@keyframes lc-in  { from{opacity:0;transform:translateY(-6px);} to{opacity:1;transform:none;} }
+@keyframes lc-new { 0%{box-shadow:0 0 0 0 rgba(138,56,245,.6);} 80%{box-shadow:0 0 0 8px rgba(138,56,245,0);} 100%{box-shadow:none;} }
+
+.lp-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+  flex-shrink: 0;
+}
+.lp-card__body {}
+.lp-card__name  { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.lp-card__dream { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.5; margin-bottom: 8px; font-family: 'Inter', sans-serif; }
+.lp-card__tags  { display: flex; flex-wrap: wrap; gap: 5px; }
+.lp-card__tag   { padding: 2px 8px; border-radius: 100px; font-size: 9px; font-weight: 700; letter-spacing: .05em; }
+.lp-card__meta  { text-align: right; }
+.lp-card__time  { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,.25); }
+.lp-card__luc   { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #9d50ff; margin-top: 4px; }
+
+/* Right: stats panel */
+.lp-sidebar {
+  padding: 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+.lp-stat-card {
+  background: rgba(138,56,245,.07);
+  border: 1px solid rgba(138,56,245,.14);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.lp-stat-card__label { font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 6px; }
+.lp-stat-card__val   { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; color: #fff; }
+.lp-stat-card__sub   { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; }
+
+/* Live waveform in sidebar */
+#lp-wave-canvas { width: 100%; height: 60px; display: block; border-radius: 8px; }
+
+/* Cluster bars */
+.lp-cluster { margin-top: 4px; }
+.lp-cluster__row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.lp-cluster__name { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.5); width: 68px; flex-shrink: 0; }
+.lp-cluster__bar-wrap { flex: 1; height: 4px; background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden; }
+.lp-cluster__bar  { height: 100%; border-radius: 2px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+.lp-cluster__pct  { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,.35); width: 30px; text-align: right; flex-shrink: 0; }
+
+/* ─── DREAM DETAIL VIEW ─── */
+#dream-detail {
+  position: absolute; inset: 0; z-index: 600;
+  background: #07050f;
+  display: none; flex-direction: column;
+  overflow: hidden;
+}
+#dream-detail.open { display: flex; animation: dd-in .3s cubic-bezier(.4,0,.2,1); }
+@keyframes dd-in { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:none;} }
+
+/* Top bar con botón volver */
+.dd-topbar {
+  height: 56px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(138,56,245,.15);
+  background: rgba(6,4,15,.95);
+  position: relative; z-index: 2;
+}
+.dd-topbar__title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(255,255,255,.35);
+}
+.dd-topbar__live { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; color: #22c55e; }
+.dd-topbar__live span { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; animation: ltb-blink 1.5s ease-in-out infinite; }
+.dd-back {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(138,56,245,.12); border: 1px solid rgba(138,56,245,.35);
+  border-radius: 100px; padding: 7px 18px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+  color: #c4b5fd; cursor: pointer; transition: all .2s; letter-spacing: .03em;
+}
+.dd-back:hover { background: rgba(138,56,245,.25); color: #fff; border-color: rgba(138,56,245,.6); }
+
+/* Scroll area */
+.dd-scroll {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+.dd-scroll::-webkit-scrollbar { width: 2px; }
+.dd-scroll::-webkit-scrollbar-thumb { background: #8A38F5; border-radius: 2px; }
+
+/* Video */
+.dd-video-wrap {
+  position: relative; height: 220px; flex-shrink: 0; overflow: hidden;
+}
+.dd-video-wrap video { width:100%; height:100%; object-fit:cover; opacity:.65; display:block; }
+.dd-video-wrap::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background: linear-gradient(to bottom, rgba(7,5,15,.1) 0%, rgba(7,5,15,.0) 40%, rgba(7,5,15,1) 100%);
+}
+
+/* Content below video */
+.dd-content {
+  padding: 24px 32px 40px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* User row */
+.dd-user {
+  display: flex; align-items: center; gap: 16px;
+}
+.dd-avatar {
+  width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700;
+  border: 2px solid rgba(138,56,245,.4);
+}
+.dd-user-name  { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: #fff; }
+.dd-user-state { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 3px; letter-spacing: .08em; text-transform: uppercase; }
+
+.dd-dream-text {
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.8;
+  color: rgba(255,255,255,.7); font-style: italic;
+  border-left: 2px solid rgba(138,56,245,.5); padding-left: 16px;
+}
+.dd-stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.dd-stat {
+  background: rgba(138,56,245,.07); border: 1px solid rgba(138,56,245,.14);
+  border-radius: 12px; padding: 13px 14px;
+}
+.dd-stat__label { font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 6px; }
+.dd-stat__val   { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; }
+.dd-stat__sub   { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 2px; }
+.dd-luc-bar-wrap { height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.dd-luc-bar { height: 100%; border-radius: 2px; background: linear-gradient(90deg,#8A38F5,#b96fff); transition: width .8s cubic-bezier(.4,0,.2,1); }
+.dd-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.dd-wave-wrap { background: rgba(138,56,245,.07); border: 1px solid rgba(138,56,245,.14); border-radius: 12px; padding: 14px 16px; }
+.dd-wave-label { font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 10px; }
+#dd-wave-canvas { width: 100%; height: 50px; display: block; }
+</style>
+
+<!-- TAB BUTTON -->
+<button id="live-tab-btn" aria-label="Ver sueños en vivo">
+  <span class="ltb-dot"></span>
+  Sueños en vivo
+</button>
+
+<!-- LIVE PANEL -->
+<div id="live-panel" role="dialog" aria-modal="true" aria-label="Sueños en vivo">
+  <div class="lp-header">
+    <div class="lp-header__title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9d50ff" stroke-width="1.5"><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      Sueños en Vivo
+      <span class="lp-header__sub">/ Sleep Stock</span>
+    </div>
+    <div class="lp-header__live"><span></span>EN VIVO</div>
+    <button class="lp-close" id="lp-close-btn" aria-label="Cerrar">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="lp-body">
+    <!-- Stream -->
+    <div class="lp-stream">
+      <div class="lp-stream__header">
+        <span class="lp-stream__label">Sueños activos ahora</span>
+        <span class="lp-stream__count" id="lp-count">0 sueños</span>
+      </div>
+      <div class="lp-feed" id="lp-feed"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lp-sidebar">
+      <!-- Video destacado -->
+      <div class="lp-stat-card" style="padding:0;overflow:hidden;">
+        <div style="position:relative;">
+          <video autoplay muted loop playsinline style="width:100%;height:130px;object-fit:cover;display:block;opacity:.75;">
+            <source src="VIDEOS HYPN/14838816_1920_1080_30fps.mp4" type="video/mp4">
+          </video>
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(6,4,15,.7) 100%);pointer-events:none;"></div>
+          <div style="position:absolute;bottom:10px;left:14px;display:flex;align-items:center;gap:6px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;display:inline-block;animation:ltb-blink 1.5s ease-in-out infinite;"></span>
+            <span style="font-size:10px;font-weight:700;color:#fff;letter-spacing:.06em;">EN VIVO</span>
+          </div>
+        </div>
+        <div style="padding:10px 14px 12px;border-top:1px solid rgba(138,56,245,.12);">
+          <div class="lp-stat-card__label">Sueño destacado</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;">Transmisión activa</div>
+        </div>
+      </div>
+
+      <div class="lp-stat-card">
+        <div class="lp-stat-card__label">Soñadores activos</div>
+        <div class="lp-stat-card__val" id="lp-soñadores">0</div>
+        <div class="lp-stat-card__sub">en este momento</div>
+      </div>
+
+      <div class="lp-stat-card">
+        <div class="lp-stat-card__label">Actividad neuronal</div>
+        <canvas id="lp-wave-canvas"></canvas>
+      </div>
+
+      <div class="lp-stat-card">
+        <div class="lp-stat-card__label">Lucidez promedio</div>
+        <div class="lp-stat-card__val" id="lp-avg-luc">—</div>
+        <div class="lp-stat-card__sub">índice global</div>
+      </div>
+
+      <div class="lp-stat-card">
+        <div class="lp-stat-card__label">Distribución temática</div>
+        <div class="lp-cluster" id="lp-clusters"></div>
+      </div>
+
+      <div class="lp-stat-card" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);">
+        <div class="lp-stat-card__label" style="color:rgba(34,197,94,.6);">Estado del mercado</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;display:inline-block;animation:ltb-blink 1.5s ease-in-out infinite;"></span>
+          <span style="font-size:13px;font-weight:700;color:#22c55e;">Abierto</span>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:4px;">Volatilidad: <span style="color:#fbbf24;font-weight:600;">Moderada</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DREAM DETAIL VIEW (se abre al tocar un usuario) ── -->
+  <div id="dream-detail">
+    <!-- Top bar con botón volver siempre visible -->
+    <div class="dd-topbar">
+      <div class="dd-topbar__live"><span></span>EN VIVO</div>
+      <button class="dd-back" id="dd-back-btn">← Volver</button>
+    </div>
+    <!-- Scroll container -->
+    <div class="dd-scroll">
+      <div class="dd-video-wrap">
+        <video id="dd-video" autoplay muted loop playsinline>
+          <source id="dd-video-src" src="" type="video/mp4">
+        </video>
+      </div>
+      <div class="dd-content">
+        <div class="dd-user">
+          <div class="dd-avatar" id="dd-avatar"></div>
+          <div class="dd-user-info">
+            <div class="dd-user-name" id="dd-user-name">—</div>
+            <div class="dd-user-state" id="dd-user-state">REM activo</div>
+          </div>
+        </div>
+        <div class="dd-dream-text" id="dd-dream-text"></div>
+        <div class="dd-stats-grid">
+          <div class="dd-stat">
+            <div class="dd-stat__label">Lucidez</div>
+            <div class="dd-stat__val" id="dd-luc-val">—</div>
+            <div class="dd-luc-bar-wrap"><div class="dd-luc-bar" id="dd-luc-bar" style="width:0%"></div></div>
+          </div>
+          <div class="dd-stat">
+            <div class="dd-stat__label">Estado</div>
+            <div class="dd-stat__val" style="font-size:13px;line-height:1.3;" id="dd-estado">REM</div>
+            <div class="dd-stat__sub">fase actual</div>
+          </div>
+          <div class="dd-stat">
+            <div class="dd-stat__label">Señal</div>
+            <div class="dd-stat__val" style="color:#22c55e;">Estable</div>
+            <div class="dd-stat__sub">neural activa</div>
+          </div>
+        </div>
+        <div class="dd-tags" id="dd-tags"></div>
+        <div class="dd-wave-wrap">
+          <div class="dd-wave-label">Actividad neuronal en tiempo real</div>
+          <canvas id="dd-wave-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var tabBtn   = document.getElementById('live-tab-btn');
+  var panel    = document.getElementById('live-panel');
+  var closeBtn = document.getElementById('lp-close-btn');
+  var feed     = document.getElementById('lp-feed');
+  var waveCanvas = document.getElementById('lp-wave-canvas');
+  var waveCtx    = waveCanvas ? waveCanvas.getContext('2d') : null;
+
+  // ── DATA ──
+  var DREAM_POOL = [
+    { name:'Usuario',    dream:'Soñé varias veces que podía volar. Esta vez supe que estaba soñando y aprendí a controlar el vuelo. Para despegar tenía que dar dos saltos seguidos sin tocar el piso.', themes:['Lucidez','Surrealismo'], luc:88, color:'#9d50ff' },
+    { name:'Usuario',    dream:'Soñé que viajé en el tiempo al 2012. Volví a ver a mi tía que ya falleció, a mi perrito y a mis abuelos. Todo era tan real que me costó aceptar que era un sueño.', themes:['Emotivo','Surrealismo'], luc:61, color:'#60a5fa' },
+    { name:'Usuario',    dream:'Cada vez que me doy cuenta de que estoy soñando quiero despertar, pero entro en un bucle. La última vez soñé que me arrastraba y tocaba el suelo, y sentía el frío del piso.', themes:['Lucidez','Parálisis'], luc:82, color:'#a78bfa' },
+    { name:'Usuario',    dream:'Soñé que un tipo tenía la cara de un amigo, pero yo sabía que no era humano. Pensé que había escapado, pero al abrir la puerta de mi cuarto había una cabaña abandonada.', themes:['Pesadilla','Surrealismo'], luc:45, color:'#f87171' },
+    { name:'Usuario',    dream:'Un gato esfinge me miraba mientras yo me desangraba. Se paró en dos patas, prendió un cigarro y con acento francés me dijo: "así es la vida, a veces corta". Después se fue.', themes:['Surrealismo','Pesadilla'], luc:55, color:'#fbbf24' },
+    { name:'Usuario',    dream:'Estaba yendo en tren a una ciudad en el fondo del océano Pacífico. Había velociraptors comiendo bananas en los kioscos. Pasó una señorita que era mitad serpiente.', themes:['Surrealismo','Catástrofe'], luc:79, color:'#f472b6' },
+    { name:'Usuario',    dream:'Corría porque una ola de fuego lo consumía todo. Mi salvación era llegar al mar, pero entre el mar y yo había una línea interminable de casas que cercaban la playa.', themes:['Catástrofe','Pesadilla'], luc:48, color:'#34d399' },
+    { name:'Usuario',    dream:'Soñé que estaba en un hospital y moría de cáncer cerebral. Después andaba en modo espectador viendo la reacción de mi familia y qué pasaba en mi ausencia.', themes:['Emotivo','Pesadilla'], luc:67, color:'#60a5fa' },
+    { name:'Usuario',    dream:'Soñé que un tipo barbudo iba a un lugar parecido a un backroom blanco. Después de un rato encontraba un pozo en el que había una criatura humanoide sin ojos.', themes:['Pesadilla','Surrealismo'], luc:38, color:'#9d50ff' },
+    { name:'Usuario',    dream:'Soñé que me partían por la mitad. Comenzaba con alguien arrastrándome por la oscuridad. No podía moverme. El sujeto se detenía y revelaba el lugar. Era Pyramid Head.', themes:['Parálisis','Pesadilla'], luc:30, color:'#f87171' },
+    { name:'Usuario',    dream:'Me encontraba en mi casa solo viendo una película. Escuché a mis perros ladrar y salí a ver qué pasaba. Todo estaba vacío.', themes:['Pesadilla','Parálisis'], luc:35, color:'#f87171' },
+    { name:'Usuario',    dream:'Estaba en casa de mis padres y quería irme porque ya no vivo con ellos hace casi 10 años, pero no me dejaban salir. Se fue la luz y me encerraron.', themes:['Parálisis','Emotivo'], luc:42, color:'#60a5fa' },
+    { name:'Usuario',    dream:'Soñé que el mar subía lentamente y yo estaba en la terraza de un edificio viendo cómo todo desaparecía bajo el agua. No sentía miedo, solo una calma extraña.', themes:['Catástrofe','Emotivo'], luc:70, color:'#34d399' },
+    { name:'Usuario',    dream:'Soñé que podía hablar con los muertos. Me senté a tomar mate con mi abuelo como si nada. Me contó cosas del más allá pero al despertar no recuerdo nada de lo que dijo.', themes:['Emotivo','Surrealismo'], luc:65, color:'#f472b6' },
+    { name:'Usuario',    dream:'Soñé que tenía superpoderes pero solo funcionaban cuando nadie me miraba. Cada vez que alguien se daba vuelta, dejaban de funcionar.', themes:['Lucidez','Surrealismo'], luc:77, color:'#9d50ff' },
+    { name:'Usuario',    dream:'Soñé que estaba en un aeropuerto enorme intentando llegar a mi vuelo pero los pasillos cambiaban solos y nunca llegaba a la puerta de embarque.', themes:['Parálisis','Catástrofe'], luc:40, color:'#fbbf24' },
+    { name:'Usuario',    dream:'Soñé con mariposas nocturnas gigantes. Una mariposa blanca enorme con un cráneo en las alas pegada en la pared. Una mariposa rojiza enorme caminando por el suelo.', themes:['Surrealismo','Pesadilla'], luc:52, color:'#a78bfa' },
+    { name:'Usuario',    dream:'Soñé que estaba en una casa flotando en el cielo con globos. Quería salir pero no podía. Ese sueño ya lo repetí como 7 u 8 veces.', themes:['Parálisis','Surrealismo'], luc:58, color:'#60a5fa' },
+    { name:'Usuario',    dream:'Soñé que había una guerra nuclear en mi pueblo y aparecía un búnker que era un laberinto subterráneo. Bajé con compañeros y me dijeron que mi abuelo había muerto.', themes:['Catástrofe','Emotivo'], luc:44, color:'#f87171' },
+    { name:'Usuario',    dream:'De niña soñaba con arena, como si se hicieran bolsas gigantes que después se volvieran pequeñas. Me daba miedo que llegara la noche porque temía soñar lo mismo.', themes:['Pesadilla','Parálisis'], luc:28, color:'#fbbf24' },
+  ];
+  // ── MERGE SUEÑOS REGISTRADOS EN EL CHATBOT ──
+  (function(){
+    var CCOLORS = { lucidez:'#9d50ff', paralisis:'#60a5fa', catastrofe:'#fbbf24', pesadilla:'#f87171', surrealismo:'#34d399', emotivo:'#f472b6' };
+    var CLABELS = { lucidez:'Lucidez', paralisis:'Parálisis', catastrofe:'Catástrofe', pesadilla:'Pesadilla', surrealismo:'Surrealismo', emotivo:'Emotivo' };
+    var stored = [];
+    try { stored = JSON.parse(localStorage.getItem('hypn_users') || '[]'); } catch(e){}
+    stored.forEach(function(u){
+      if(!u.dream || !u.name) return;
+      var color = u.themes && u.themes[0] ? (CCOLORS[u.themes[0]] || '#9d50ff') : '#9d50ff';
+      var labels = (u.themes||[]).map(function(t){ return CLABELS[t]||t; });
+      if(!labels.length) labels = ['Emotivo'];
+      DREAM_POOL.push({ name:u.name, dream:u.dream, themes:labels, luc:u.lucidez||(u.emotion&&u.emotion.lucidez)||50, color:color });
+    });
+  })();
+
+  var CLUSTERS = [
+    { name:'Lucidez',     color:'#9d50ff', count:0 },
+    { name:'Parálisis',   color:'#60a5fa', count:0 },
+    { name:'Catástrofe',  color:'#fbbf24', count:0 },
+    { name:'Pesadilla',   color:'#f87171', count:0 },
+    { name:'Surrealismo', color:'#34d399', count:0 },
+    { name:'Emotivo',     color:'#f472b6', count:0 },
+  ];
+
+  var cards = [];
+  var totalSoñadores = 0;
+  var wavePhase = 0;
+  var waveAnim = null;
+  var panelOpen = false;
+
+  // ── OPEN / CLOSE ──
+  function openPanel() {
+    panelOpen = true;
+    panel.classList.add('open');
+    tabBtn.classList.add('active');
+    tabBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Volver a Sleep Stock';
+    document.body.style.overflow = 'hidden';
+    startWave();
+    if (cards.length === 0) {
+      // Seed with a few initial cards
+      var initial = [0,2,4,6];
+      initial.forEach(function(i,j){
+        setTimeout(function(){ addCard(DREAM_POOL[i], true); }, j * 180);
+      });
+    }
+  }
+  function closePanel() {
+    panelOpen = false;
+    panel.classList.remove('open');
+    tabBtn.classList.remove('active');
+    tabBtn.innerHTML = '<span class="ltb-dot"></span> Sueños en vivo';
+    document.body.style.overflow = '';
+    cancelAnimationFrame(waveAnim);
+  }
+
+  tabBtn.addEventListener('click', function(){ panelOpen ? closePanel() : openPanel(); });
+  closeBtn.addEventListener('click', closePanel);
+  panel.addEventListener('click', function(e){ if(e.target===panel) closePanel(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && panelOpen) closePanel(); });
+
+  // ── AUTO-OPEN if arrived via #live ──
+  if (window.location.hash === '#live') {
+    setTimeout(openPanel, 600);
+  }
+
+  // ── ADD CARD ──
+  function addCard(data, isNew) {
+    var now = new Date();
+    var timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    var initials = data.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2);
+
+    // Vertical videos — portrait, perfectos para avatar circular
+    var vidSrcs = [
+      'VIDEOS HYPN/14681209_1080_1920_30fps.mp4',
+      'VIDEOS HYPN/14729935_1080_1920_30fps.mp4',
+    ];
+    var useVid = (cards.length % 3 === 0);
+    var avatarHtml = useVid
+      ? '<div class="lp-avatar" style="overflow:hidden;padding:0;border:1px solid rgba(138,56,245,.4);">' +
+          '<video autoplay muted loop playsinline style="width:44px;height:44px;object-fit:cover;display:block;border-radius:50%;">' +
+            '<source src="' + vidSrcs[cards.length % 2] + '" type="video/mp4">' +
+          '</video>' +
+        '</div>'
+      : '<div class="lp-avatar" style="background:' + data.color.replace(')',',0.18)').replace('rgb','rgba') + ';color:' + data.color + ';border:1px solid ' + data.color.replace(')',',0.35)').replace('rgb','rgba') + ';">' + initials + '</div>';
+
+    var card = document.createElement('div');
+    card.className = 'lp-card' + (isNew ? ' new' : '');
+    card.innerHTML =
+      avatarHtml +
+      '<div class="lp-card__body">' +
+        '<div class="lp-card__name">' + data.name + '</div>' +
+        '<div class="lp-card__dream">"' + data.dream + '"</div>' +
+        '<div class="lp-card__tags">' +
+          data.themes.map(function(t){ return '<span class="lp-card__tag" style="background:' + data.color.replace(')',',0.12)').replace('rgb','rgba') + ';border:1px solid ' + data.color.replace(')',',0.3)').replace('rgb','rgba') + ';color:' + data.color + ';">' + t + '</span>'; }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="lp-card__meta">' +
+        '<div class="lp-card__time">' + timeStr + '</div>' +
+        '<div class="lp-card__luc">' + data.luc + '%</div>' +
+      '</div>';
+
+    // Prepend
+    feed.insertBefore(card, feed.firstChild);
+    cards.unshift({ data: data, el: card });
+
+    // Keep max 20
+    if (cards.length > 20) {
+      var old = cards.pop();
+      old.el.style.opacity = '0';
+      old.el.style.transition = 'opacity .3s';
+      setTimeout(function(){ if(old.el.parentNode) old.el.parentNode.removeChild(old.el); }, 300);
+    }
+
+    // Remove 'new' class after animation
+    setTimeout(function(){ card.classList.remove('new'); }, 800);
+
+    // ── CLICK → VER SUEÑO EN TIEMPO REAL ──
+    var allVids = [
+      'VIDEOS HYPN/1.mp4',
+      'VIDEOS HYPN/14838816_1920_1080_30fps.mp4',
+      'VIDEOS HYPN/14787696_1920_1080_24fps.mp4',
+    ];
+    var cardVid = allVids[totalSoñadores % allVids.length];
+    card.style.cursor = 'pointer';
+    card.title = 'Ver sueño en tiempo real';
+    (function(d, v){ card.addEventListener('click', function(){ openDreamDetail(d, v); }); })(data, cardVid);
+
+    // Update stats
+    totalSoñadores++;
+    updateStats();
+    updateClusters(data.themes);
+  }
+
+  // ── DREAM DETAIL ──
+  var ddWaveAnim = null;
+  var ddWavePhase = 0;
+
+  function openDreamDetail(data, vidSrc) {
+    var detail   = document.getElementById('dream-detail');
+    var ddVid    = document.getElementById('dd-video');
+    var ddSrc    = document.getElementById('dd-video-src');
+    var estados  = ['REM PROFUNDO', 'REM EXPANSIVO', 'REM FLUIDO', 'PROCESAMIENTO', 'NREM LENTO'];
+    var estado   = estados[Math.floor(Math.random() * estados.length)];
+    var initials = data.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2);
+
+    // Video
+    ddSrc.src = vidSrc;
+    ddVid.load();
+    ddVid.play().catch(function(){});
+
+    // Avatar
+    var av = document.getElementById('dd-avatar');
+    av.textContent = initials;
+    av.style.background = data.color + '28';
+    av.style.color = data.color;
+    av.style.borderColor = data.color;
+
+    // Info
+    document.getElementById('dd-user-name').textContent  = data.name;
+    document.getElementById('dd-user-state').textContent = estado;
+    document.getElementById('dd-dream-text').textContent = '"' + data.dream + '"';
+    document.getElementById('dd-luc-val').textContent    = data.luc + '%';
+    document.getElementById('dd-luc-bar').style.width    = data.luc + '%';
+    document.getElementById('dd-estado').textContent     = estado;
+
+    // Tags
+    document.getElementById('dd-tags').innerHTML = data.themes.map(function(t){
+      return '<span class="lp-card__tag" style="background:' + data.color + '20;border:1px solid ' + data.color + '50;color:' + data.color + ';font-size:10px;padding:4px 12px;">' + t + '</span>';
+    }).join('');
+
+    detail.classList.add('open');
+    var tabBtnEl = document.getElementById('live-tab-btn');
+    if (tabBtnEl) tabBtnEl.style.display = 'none';
+    startDdWave(data.color);
+  }
+
+  function closeDreamDetail() {
+    var detail = document.getElementById('dream-detail');
+    var ddVid  = document.getElementById('dd-video');
+    detail.classList.remove('open');
+    ddVid.pause();
+    cancelAnimationFrame(ddWaveAnim);
+    var tabBtnEl = document.getElementById('live-tab-btn');
+    if (tabBtnEl) tabBtnEl.style.display = '';
+  }
+
+  document.getElementById('dd-back-btn').addEventListener('click', closeDreamDetail);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDreamDetail(); });
+
+  function startDdWave(color) {
+    cancelAnimationFrame(ddWaveAnim);
+    ddWavePhase = 0;
+    var c = document.getElementById('dd-wave-canvas');
+    if (!c) return;
+    var ctx2 = c.getContext('2d');
+    c.width  = c.offsetWidth  * (window.devicePixelRatio||1);
+    c.height = c.offsetHeight * (window.devicePixelRatio||1);
+    ctx2.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+    var detail = document.getElementById('dream-detail');
+    var ws = [
+      { amp:12, freq:.038, spd:.06, color: color || '#9d50ff',    w:2   },
+      { amp:7,  freq:.065, spd:.09, color:'rgba(185,111,255,.45)', w:1.2 },
+      { amp:4,  freq:.10,  spd:.12, color:'rgba(96,165,250,.3)',   w:1   },
+    ];
+    (function frame(){
+      if (!detail.classList.contains('open')) return;
+      var W = c.offsetWidth, H = c.offsetHeight;
+      ctx2.clearRect(0, 0, W, H);
+      ws.forEach(function(wv){
+        ctx2.beginPath();
+        for(var i=0; i<=W; i++){
+          var y = H/2 + Math.sin(i*wv.freq + ddWavePhase*wv.spd*60)*wv.amp
+                       + Math.sin(i*wv.freq*1.7 + ddWavePhase*wv.spd*35)*wv.amp*.5;
+          i===0 ? ctx2.moveTo(i,y) : ctx2.lineTo(i,y);
+        }
+        ctx2.strokeStyle = wv.color;
+        ctx2.lineWidth   = wv.w;
+        ctx2.stroke();
+      });
+      ddWavePhase++;
+      ddWaveAnim = requestAnimationFrame(frame);
+    })();
+  }
+
+  function updateStats() {
+    document.getElementById('lp-count').textContent = cards.length + ' sueño' + (cards.length !== 1 ? 's' : '');
+    document.getElementById('lp-soñadores').textContent = totalSoñadores;
+    var avgLuc = Math.round(cards.reduce(function(s,c){ return s + c.data.luc; }, 0) / cards.length);
+    document.getElementById('lp-avg-luc').textContent = avgLuc + '%';
+  }
+
+  function updateClusters(themes) {
+    themes.forEach(function(t){
+      CLUSTERS.forEach(function(c){ if(c.name===t) c.count++; });
+    });
+    var max = Math.max.apply(null, CLUSTERS.map(function(c){return c.count;})) || 1;
+    var html = CLUSTERS.map(function(c){
+      var pct = Math.round((c.count/max)*100);
+      return '<div class="lp-cluster__row">' +
+        '<span class="lp-cluster__name">' + c.name + '</span>' +
+        '<div class="lp-cluster__bar-wrap"><div class="lp-cluster__bar" style="width:' + pct + '%;background:' + c.color + ';"></div></div>' +
+        '<span class="lp-cluster__pct">' + pct + '%</span>' +
+        '</div>';
+    }).join('');
+    document.getElementById('lp-clusters').innerHTML = html;
+  }
+
+  // ── STREAM INTERVAL ──
+  var poolIdx = 4;
+  setInterval(function(){
+    if (!panelOpen) return;
+    poolIdx = (poolIdx + 1) % DREAM_POOL.length;
+    addCard(DREAM_POOL[poolIdx], true);
+  }, 4500);
+
+  // ── WAVE ANIMATION ──
+  function startWave() {
+    if (!waveCtx) return;
+    var c = waveCanvas;
+    c.width  = c.offsetWidth  * (window.devicePixelRatio||1);
+    c.height = c.offsetHeight * (window.devicePixelRatio||1);
+    waveCtx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+    (function frame(){
+      if (!panelOpen) return;
+      var W = c.offsetWidth, H = c.offsetHeight;
+      waveCtx.clearRect(0,0,W,H);
+      var waves = [
+        { amp:10, freq:.04, spd:.05, color:'rgba(138,56,245,.7)',  w:1.5 },
+        { amp:6,  freq:.07, spd:.08, color:'rgba(185,111,255,.4)', w:1   },
+      ];
+      waves.forEach(function(wv){
+        waveCtx.beginPath();
+        for(var i=0;i<=W;i++){
+          var y = H/2 + Math.sin(i*wv.freq + wavePhase*wv.spd*60)*wv.amp
+                       + Math.sin(i*wv.freq*1.6 + wavePhase*wv.spd*40)*wv.amp*.5;
+          i===0 ? waveCtx.moveTo(i,y) : waveCtx.lineTo(i,y);
+        }
+        waveCtx.strokeStyle = wv.color;
+        waveCtx.lineWidth   = wv.w;
+        waveCtx.stroke();
+      });
+      wavePhase++;
+      waveAnim = requestAnimationFrame(frame);
+    })();
+  }
+})();
+</script>
+
+<a href="hypn-ia.html" class="float-ia" aria-label="Abrir HYPN IA">
+  <div class="float-ia__icon">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a5 5 0 015 5c0 2.5-1.5 4.5-3.5 5.4V14h-3v-1.6C8.5 11.5 7 9.5 7 7a5 5 0 015-5z"/><rect x="9" y="14" width="6" height="2" rx="1"/><rect x="10" y="16" width="4" height="3" rx="1"/></svg>
+  </div>
+  Contarle mi sueño a HYPN IA
+  <span class="float-ia__live"></span>
+</a>
+</body>
+</html>
